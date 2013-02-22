@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+<tiles-definitions>
+    <definition name="base.definition"
+                template="/WEB-INF/tiles/baseLayout.jsp">
+        <put-attribute name="title" value="Texthistory"/>
+        <put-attribute name="head" value="/WEB-INF/tiles/head.jsp"/>
+        <put-attribute name="nav" value="/WEB-INF/tiles/nav.jsp"/>
+        <put-attribute name="toolset" value="/WEB-INF/tiles/toolset.jsp"/>
+        <put-attribute name="aside" value="/WEB-INF/tiles/aside.jsp"/>
+        <put-attribute name="data" value="/WEB-INF/tiles/data.jsp"/>
+        <put-attribute name="userinfo" value="/WEB-INF/tiles/userinfo.jsp"/>
+        <put-attribute name="include" value="/WEB-INF/tiles/include.jsp"/>
+    </definition>
+
+    <definition name="data.definition"
+                template="/WEB-INF/tiles/dataLayout.jsp">
+        <put-attribute name="data" value="/WEB-INF/tiles/data.jsp"/>
+    </definition>
+
+    <!-- SYSTEM PAGES -->
+    <definition name="not-authorized"
+                template="/WEB-INF/jsp/system/not-authorized.jsp">
+    </definition>
+
+    <definition name="no-project"
+                template="/WEB-INF/jsp/system/no-project.jsp">
+    </definition>
+
+    <!-- INDEX : LOGGING PAGE -->
+    <definition name="index"
+                template="/WEB-INF/jsp/index.jsp">
+    </definition>
+
+    <!-- HOME -->
+    <!--    GET-->
+    <definition name="home" extends="base.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/home/data.jsp"/>
+    </definition>
+    <!--    POST-->
+    <definition name="data-home" extends="data.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/home/data.jsp"/>
+    </definition>
+
+
+    <!--PROJECT-->
+    <!--    GET-->
+    <definition name="project-list" extends="base.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/project/list/data.jsp"/>
+    </definition>
+
+    <definition name="project-add" extends="base.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/project/add/data.jsp"/>
+    </definition>
+
+    <definition name="project-view" extends="base.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/project/view/data.jsp"/>
+    </definition>
+    <!--    POST-->
+    <definition name="data-project-list" extends="data.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/project/list/data.jsp"/>
+    </definition>
+
+    <definition name="data-project-add" extends="data.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/project/add/data.jsp"/>
+    </definition>
+
+    <definition name="data-project-view" extends="data.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/project/view/data.jsp"/>
+    </definition>
+
+
+    <!--CONTENT ANALYSIS-->
+    <!--    GET-->
+    <definition name="content-statistic" extends="base.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/content/base/data.jsp"/>
+    </definition>
+
+    <definition name="content-graph" extends="base.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/content/graph/data.jsp"/>
+    </definition>
+
+    <definition name="content-key-list" extends="base.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/content/key/list/data.jsp"/>
+    </definition>
+
+    <definition name="content-key-view" extends="base.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/content/key/view/data.jsp"/>
+    </definition>
+    <!--    POST-->
+    <definition name="data-content-statistic" extends="data.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/content/base/data.jsp"/>
+    </definition>
+
+    <definition name="data-content-graph" extends="data.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/content/graph/data.jsp"/>
+    </definition>
+
+    <definition name="data-content-key-list" extends="data.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/content/key/list/data.jsp"/>
+    </definition>
+
+    <definition name="data-content-key-view" extends="data.definition">
+        <put-attribute name="data" value="/WEB-INF/jsp/content/key/view/data.jsp"/>
+    </definition>
+
+    <!--DISCOURCE ANALYSIS-->
+    <definition name="discource" extends="base.definition">
+        <put-attribute name="nav" value="/WEB-INF/jsp/discource/nav.jsp"/>
+        <put-attribute name="menu" value="/WEB-INF/jsp/discource/base/menu.jsp"/>
+        <put-attribute name="actions" value="/WEB-INF/jsp/discource/base/actions.jsp"/>
+        <put-attribute name="aside" value="/WEB-INF/jsp/discource/aside.jsp"/>
+        <put-attribute name="data" value="/WEB-INF/jsp/discource/base/data.jsp"/>
+        <put-attribute name="include" value="/WEB-INF/jsp/discource/base/include.jsp"/>
+    </definition>
+
+    <definition name="discource-view" extends="base.definition">
+        <put-attribute name="nav" value="/WEB-INF/jsp/discource/nav.jsp"/>
+        <put-attribute name="menu" value="/WEB-INF/jsp/discource/view/menu.jsp"/>
+        <put-attribute name="actions" value="/WEB-INF/jsp/discource/view/actions.jsp"/>
+        <put-attribute name="aside" value="/WEB-INF/jsp/discource/aside.jsp"/>
+        <put-attribute name="data" value="/WEB-INF/jsp/discource/view/data.jsp"/>
+        <put-attribute name="include" value="/WEB-INF/jsp/discource/view/include.jsp"/>
+    </definition>
+
+    <!--PSYCHO ANALYSIS-->
+    <definition name="psycho" extends="base.definition">
+        <put-attribute name="nav" value="/WEB-INF/jsp/psycho/nav.jsp"/>
+        <put-attribute name="menu" value="/WEB-INF/jsp/psycho/base/menu.jsp"/>
+        <put-attribute name="actions" value="/WEB-INF/jsp/psycho/base/actions.jsp"/>
+        <put-attribute name="aside" value="/WEB-INF/jsp/psycho/aside.jsp"/>
+        <put-attribute name="data" value="/WEB-INF/jsp/psycho/base/data.jsp"/>
+        <put-attribute name="include" value="/WEB-INF/jsp/psycho/base/include.jsp"/>
+    </definition>
+
+    <definition name="psycho-view" extends="base.definition">
+        <put-attribute name="nav" value="/WEB-INF/jsp/psycho/nav.jsp"/>
+        <put-attribute name="menu" value="/WEB-INF/jsp/psycho/view/menu.jsp"/>
+        <put-attribute name="actions" value="/WEB-INF/jsp/psycho/view/actions.jsp"/>
+        <put-attribute name="aside" value="/WEB-INF/jsp/psycho/aside.jsp"/>
+        <put-attribute name="data" value="/WEB-INF/jsp/psycho/view/data.jsp"/>
+        <put-attribute name="include" value="/WEB-INF/jsp/psycho/view/include.jsp"/>
+    </definition>
+
+</tiles-definitions>
