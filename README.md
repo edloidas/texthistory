@@ -1,4 +1,4 @@
-Texthistory
+п»їTexthistory
 ===========
 
 #### Description ####
@@ -10,6 +10,6 @@ Java web application for text mining.
 
 #### License ####
 
-Произведение «[Texthistory](https://github.com/edloidas/texthistory/)» созданное автором по имени [edloidas](https://github.com/edloidas/), публикуется на условиях [лицензии Creative Commons «Attribution-NonCommercial-ShareAlike» («Атрибуция — Некоммерческое использование — На тех же условиях») 3.0 Непортированная](http://creativecommons.org/licenses/by-nc-sa/3.0/deed.ru).
+РџСЂРѕРёР·РІРµРґРµРЅРёРµ В«[Texthistory](https://github.com/edloidas/texthistory/)В» СЃРѕР·РґР°РЅРЅРѕРµ Р°РІС‚РѕСЂРѕРј РїРѕ РёРјРµРЅРё [edloidas](https://github.com/edloidas/), РїСѓР±Р»РёРєСѓРµС‚СЃСЏ РЅР° СѓСЃР»РѕРІРёСЏС… [Р»РёС†РµРЅР·РёРё Creative Commons В«Attribution-NonCommercial-ShareAlikeВ» (В«РђС‚СЂРёР±СѓС†РёСЏ вЂ” РќРµРєРѕРјРјРµСЂС‡РµСЃРєРѕРµ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ вЂ” РќР° С‚РµС… Р¶Рµ СѓСЃР»РѕРІРёСЏС…В») 3.0 РќРµРїРѕСЂС‚РёСЂРѕРІР°РЅРЅР°СЏ](http://creativecommons.org/licenses/by-nc-sa/3.0/deed.ru).
 
-![license](http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png "Лицензия Creative Commons")
+![license](http://i.creativecommons.org/l/by-nc-sa/3.0/88x31.png "Р›РёС†РµРЅР·РёСЏ Creative Commons")
