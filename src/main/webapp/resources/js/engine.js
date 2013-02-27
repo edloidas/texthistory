@@ -276,8 +276,9 @@ var handler = new function () {
 
     /** Delete project */
     this.projectDelete = function projectDelete() {
-        var id = $($('input[name=id]:checked').get(0)).val();
-        var tr = $($('input[name=id]:checked').get(0)).parent().parent();
+        var checked = $('input[name=id]:checked').get(0);
+        var id = $(checked).val();
+        var tr = $(checked).parent().parent();
 
         if (id == null) {
             notify('warning', 'Проект не выбран.');
@@ -372,6 +373,354 @@ var handler = new function () {
         $('#project-new-name').val('');
         $('#project-new-desc').val('');
     }
+
+    // --- PROJECT :: VIEW ---
+    /** Open project for view */
+    this.projectView = function projectView() {
+        var id = $($('input[name=id]:checked').get(0)).val();
+        if (id == null) {
+            notify('warning', 'Проект не выбран.');
+        } else {
+            dataShowLoading();
+            $.ajax({
+                type: 'GET',
+                url: '/texthistory/project/view/' + id + '/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                dataType: 'html'
+            }).done(function (data) {
+                    changePage('Просмотр проекта', data);
+                }).fail(function () {
+                    notify('error', 'Unable to reach the server.');
+                });
+        }
+    }
+    /** Open project for view (DATA) */
+    this.projectViewData = function projectViewData() {
+        var id = $($('input[name=id]:checked').get(0)).val();
+        if (id == null) {
+            notify('warning', 'Проект не выбран.');
+        } else {
+            dataShowLoading();
+            $.ajax({
+                type: 'POST',
+                url: '/texthistory/project/view/' + id + '/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                dataType: 'html'
+            }).done(function (data) {
+                    changePage('Просмотр проекта',
+                        [
+                            {id: 'do-proj-view-exclude', text: 'Сделать активным'},
+                            {id: 'do-proj-view-status', text: 'Изменить статус'},
+                            {id: 'sep', text: ''},
+                            {id: 'do-proj-view-save', text: 'Сохранить'},
+                            {id: 'sep', text: ''}
+                        ],
+                        data);
+                }).fail(function () {
+                    notify('error', 'Unable to reach the server.');
+                });
+        }
+    }
+
+    /** Saves the project state */
+    this.projectViewSave = function projectViewSave() {
+        if ($('#project-add-name').val() == '') {
+            notify('warning', 'Название проекта не может быть пустым.');
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/texthistory/project/update/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                dataType: 'json',
+                data: {"id": $('#project-view-id').text(),
+                    "name": $('#project-view-name').val(),
+                    "desc": $('#project-view-desc').val()}
+            }).done(function (data) {
+                    if (data.code == 0 || data.code == 3) {
+                        notify('success', data.msg);
+                        if (data.code == 3) {
+                            $('#cur-project').html(data.data);
+                        }
+                    } else {
+                        notify('warning', data.msg);
+                    }
+                }).fail(function () {
+                    notify('error', 'Unable to process request.');
+                });
+        }
+    }
+
+    // Upload progress
+    function progressHandlingFunction(e) {
+        if (e.lengthComputable) {
+            $('#source-local-progress').attr({value: e.loaded, max: e.total});
+        }
+    }
+
+    /** Download sources */
+    // TODO : Add drag n' drop
+    this.projectViewSource = function projectViewSource() {
+        var valid = true;
+        var length = $('#source-local')[0].files.length;
+        var file;
+        var message = "необходимо выбрать файлы.";
+        if (length == 0) {
+            valid = false;
+        }
+        for (var i = 0; i < length; i++) {
+            file = $('#source-local')[0].files[i];
+            if (file.type != 'text/plain') {
+                valid = false;
+                message = "File " + file.name + " has illegal type.";
+                break;
+            }
+        }
+
+        if (valid == false) {
+            notify('warning', message);
+        } else {
+
+            var formData = new FormData($('#source-local-form')[0]);
+            $('#project-id').val($('#project-view-id').text());
+            var id = $('#project-view-id').text();
+            $.ajax({
+                url: '/texthistory/project/' + id + '/upload/',  //server script to process data
+                type: 'POST',
+                xhr: function () {
+                    myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) { // check if upload property exists
+                        myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // for handling the progress of the upload
+                    }
+                    return myXhr;
+                },
+                // Form data
+                data: formData,
+                // To be able to retrieve json response
+                dataType: 'json',
+                // Options to tell JQuery not to process data or worry about content-type
+                cache: false,
+                contentType: false,
+                processData: false
+            }).done(function (data) {
+                    if (data.code == 3) {
+                        notify('success', data.msg);
+                    } else {
+                        notify('warning', data.msg);
+                    }
+                }).fail(function () {
+                    notify('error', 'Unable to process request.');
+                });
+        }
+    }
+
+    /** Removes source from project */
+    this.projectViewSourceExclude = function projectViewSourceExclude() {
+        var checked = $('input[name=id]:checked').get(0);
+        var id = $(checked).val();
+        var tr = $(checked).parent().parent();
+
+        if (id == null) {
+            notify('warning', 'Source not selected.');
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/texthistory/source/delete/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                dataType: 'json',
+                data: {"id": id}
+            }).done(function (data) {
+                    if (data.code == 0) {
+                        notify('success', data.msg);
+                        $(tr).remove();
+                    } else {
+                        notify('warning', data.msg);
+                    }
+                }).fail(function () {
+                    notify('error', 'Unable to process request.');
+                });
+        }
+    }
+
+    /** Change status of the source */
+    this.projectViewSourceStatus = function projectViewSourceStatus() {
+        var checked = $('input[name=id]:checked').get(0);
+        var id = $(checked).val();
+        var tr = $(checked).parent().parent();
+
+        if (id == null) {
+            notify('warning', 'Source not selected.');
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/texthistory/source/status/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                dataType: 'json',
+                data: {"id": id}
+            }).done(function (data) {
+                    if (data.code == 3) {
+                        notify('success', data.msg);
+                        if (data.data == "true") {
+                            $($(tr).children().get(2)).html("подключен");
+                        } else {
+                            $($(tr).children().get(2)).html("отключен");
+                        }
+
+                    } else {
+                        notify('warning', data.msg);
+                    }
+                }).fail(function () {
+                    notify('error', 'Unable to process request.');
+                });
+        }
+    }
+
+    // --- CONTENT ANALYSIS :: STATISTICS ---
+    /** Content analysis statistics */
+    this.caStatistics = function caStatistics() {
+        dataShowLoading();
+        $.ajax({
+            type: 'GET',
+            url: '/texthistory/content/statistic/',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            dataType: 'html'
+        }).done(function (data) {
+                changePage('Статистика данных', data);
+            }).fail(function () {
+                notify('error', 'Unable to reach the server.');
+            });
+    }
+    /** Content analysis statistics (DATA)*/
+    this.caStatisticsData = function caStatisticsData() {
+        dataShowLoading();
+        $.ajax({
+            type: 'POST',
+            url: '/texthistory/content/statistic/',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            dataType: 'html'
+        }).done(function (data) {
+                changePage('Статистика данных',
+                    [
+                        {id: 'sep', text: ''}
+                    ],
+                    data);
+            }).fail(function () {
+                notify('error', 'Unable to reach the server.');
+            });
+    }
+
+    /** Content analysis graphics */
+    this.caGraphics = function caGraphics() {
+        dataShowLoading();
+        $.ajax({
+            type: 'GET',
+            url: '/texthistory/content/graph/',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            dataType: 'html'
+        }).done(function (data) {
+                changePage('Графики распределенности', data);
+            }).fail(function () {
+                notify('error', 'Unable to reach the server.');
+            });
+    }
+    /** Content analysis graphics (DATA)*/
+    this.caGraphicsData = function caGraphicsData() {
+        dataShowLoading();
+        $.ajax({
+            type: 'POST',
+            url: '/texthistory/content/graph/',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            dataType: 'html'
+        }).done(function (data) {
+                changePage('Графики распределенности',
+                    [
+                        {id: 'sep', text: ''}
+                    ],
+                    data);
+            }).fail(function () {
+                notify('error', 'Unable to reach the server.');
+            });
+    }
+
+    // --- CONTENT ANALYSIS :: KEY LIST ---
+    /** Content analysis key words list */
+    this.caKeyList = function caKeyList() {
+        dataShowLoading();
+        $.ajax({
+            type: 'GET',
+            url: '/texthistory/content/key/list/',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            dataType: 'html'
+        }).done(function (data) {
+                changePage('Ключевые слова/категории', data);
+            }).fail(function () {
+                notify('error', 'Unable to reach the server.');
+            });
+    }
+    /** Content analysis key words list (DATA)*/
+    this.caKeyListData = function caKeyListData() {
+        dataShowLoading();
+        $.ajax({
+            type: 'POST',
+            url: '/texthistory/content/key/list/',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            dataType: 'html'
+        }).done(function (data) {
+                changePage('Ключевые слова/категории',
+                    [
+                        {id: 'do-cont-key-list-view', text: 'Просмотреть'},
+                        {id: 'sep', text: ''}
+                    ],
+                    data);
+            }).fail(function () {
+                notify('error', 'Unable to reach the server.');
+            });
+    }
+
+    // --- CONTENT ANALYSIS :: KEY VIEW ---
+    /** Content analysis key words view */
+    this.caKeyView = function caKeyView() {
+        var id = $($('input[name=id]:checked').get(0)).val();
+        if (id == null) {
+            notify('warning', 'Слово/категория не выбрана.');
+        } else {
+            dataShowLoading();
+            $.ajax({
+                type: 'GET',
+                url: '/texthistory/content/key/view/' + id + '/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                dataType: 'html'
+            }).done(function (data) {
+                    changePage('Просмотр слова/категории', data);
+                }).fail(function () {
+                    notify('error', 'Unable to reach the server.');
+                });
+        }
+    }
+    /** Content analysis key words view (DATA)*/
+    this.caKeyViewData = function caKeyViewData() {
+        var id = $($('input[name=id]:checked').get(0)).val();
+        if (id == null) {
+            notify('warning', 'Слово/категория не выбрана.');
+        } else {
+            dataShowLoading();
+            $.ajax({
+                type: 'POST',
+                url: '/texthistory/content/key/view/' + id + '/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                dataType: 'html'
+            }).done(function (data) {
+                    changePage('Просмотр слова/категории',
+                        [
+                            {id: 'do-proj-view-exclude', text: 'Добавить в категорию'},
+                            {id: 'do-proj-view-status', text: 'Расформировать категорию'},
+                            {id: 'sep', text: ''}
+                        ],
+                        data);
+                }).fail(function () {
+                    notify('error', 'Unable to reach the server.');
+                });
+        }
+    }
 }
 //------------------------------------------------------------------------
 // AJAX EVENTS
@@ -398,263 +747,28 @@ $(document).on('click', '#do-proj-new-clear', handler.projectNewClear);
 
 // --- PROJECT :: VIEW ---
 // list view
-$(document).on('click', '#do-proj-list-view', function () {
-    var id = $($('input[name=id]:checked').get(0)).val();
-    if (id == null) {
-        notify('warning', 'Проект не выбран.');
-    } else {
-        dataShowLoading();
-        $.ajax({
-            type: 'POST',
-            url: '/texthistory/project/view/' + id + '/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'html'
-        }).done(function (data) {
-                changePage('Просмотр проекта',
-                    [
-                        {id: 'do-proj-view-exclude', text: 'Сделать активным'},
-                        {id: 'do-proj-view-status', text: 'Изменить статус'},
-                        {id: 'sep', text: ''},
-                        {id: 'do-proj-view-save', text: 'Сохранить'},
-                        {id: 'sep', text: ''}
-                    ],
-                    data);
-            }).fail(function () {
-                notify('error', 'Unable to reach the server.');
-            });
-    }
-});
+$(document).on('click', '#do-proj-list-view', handler.projectView);
 
-$(document).on('click', '#do-proj-view-save', function () {
-    if ($('#project-add-name').val() == '') {
-        notify('warning', 'Название проекта не может быть пустым.');
-    } else {
-        $.ajax({
-            type: 'POST',
-            url: '/texthistory/project/update/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'json',
-            data: {"id": $('#project-view-id').text(),
-                "name": $('#project-view-name').val(),
-                "desc": $('#project-view-desc').val()}
-        }).done(function (data) {
-                if (data.code == 0 || data.code == 3) {
-                    notify('success', data.msg);
-                    if (data.code == 3) {
-                        $('#cur-project').html(data.data);
-                    }
-                } else {
-                    notify('warning', data.msg);
-                }
-            }).fail(function () {
-                notify('error', 'Unable to process request.');
-            });
-    }
-});
+$(document).on('click', '#do-proj-view-save', handler.projectViewSave);
 
 // Download new sources
-// TODO : Add drag n' drop
-$(document).on('click', '#btn-source-local', function () {
-    var valid = true;
-    var length = $('#source-local')[0].files.length;
-    var file;
-    var message = "необходимо выбрать файлы.";
-    if (length == 0) {
-        valid = false;
-    }
-    for (var i = 0; i < length; i++) {
-        file = $('#source-local')[0].files[i];
-        if (file.type != 'text/plain') {
-            valid = false;
-            message = "File " + file.name + " has illegal type.";
-            break;
-        }
-    }
-
-    if (valid == false) {
-        notify('warning', message);
-    } else {
-
-        var formData = new FormData($('#source-local-form')[0]);
-        $('#project-id').val($('#project-view-id').text());
-        var id = $('#project-view-id').text();
-        $.ajax({
-            url: '/texthistory/project/' + id + '/upload/',  //server script to process data
-            type: 'POST',
-            xhr: function () {
-                myXhr = $.ajaxSettings.xhr();
-                if (myXhr.upload) { // check if upload property exists
-                    myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // for handling the progress of the upload
-                }
-                return myXhr;
-            },
-            // Form data
-            data: formData,
-            // To be able to retrieve json response
-            dataType: 'json',
-            // Options to tell JQuery not to process data or worry about content-type
-            cache: false,
-            contentType: false,
-            processData: false
-        }).done(function (data) {
-                if (data.code == 3) {
-                    notify('success', data.msg);
-                } else {
-                    notify('warning', data.msg);
-                }
-            }).fail(function () {
-                notify('error', 'Unable to process request.');
-            });
-    }
-});
-
-// Upload progress
-function progressHandlingFunction(e) {
-    if (e.lengthComputable) {
-        $('#source-local-progress').attr({value: e.loaded, max: e.total});
-    }
-}
+$(document).on('click', '#btn-source-local', handler.projectViewSource);
 
 // exclude
-$(document).on('click', '#do-proj-view-exclude', function () {
-    var id = $($('input[name=id]:checked').get(0)).val();
-    var tr = $($('input[name=id]:checked').get(0)).parent().parent();
-
-    if (id == null) {
-        notify('warning', 'Source not selected.');
-    } else {
-        $.ajax({
-            type: 'POST',
-            url: '/texthistory/source/delete/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'json',
-            data: {"id": id}
-        }).done(function (data) {
-                if (data.code == 0) {
-                    notify('success', data.msg);
-                    $(tr).remove();
-                } else {
-                    notify('warning', data.msg);
-                }
-            }).fail(function () {
-                notify('error', 'Unable to process request.');
-            });
-    }
-});
+$(document).on('click', '#do-proj-view-exclude', handler.projectViewSourceExclude);
 
 // Source updating status
-$(document).on('click', '#do-proj-view-status', function () {
-    var id = $($('input[name=id]:checked').get(0)).val();
-    var tr = $($('input[name=id]:checked').get(0)).parent().parent();
-
-    if (id == null) {
-        notify('warning', 'Source not selected.');
-    } else {
-        $.ajax({
-            type: 'POST',
-            url: '/texthistory/source/status/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'json',
-            data: {"id": id}
-        }).done(function (data) {
-                if (data.code == 3) {
-                    notify('success', data.msg);
-                    if (data.data == "true") {
-                        $($(tr).children().get(2)).html("подключен");
-                    } else {
-                        $($(tr).children().get(2)).html("отключен");
-                    }
-
-                } else {
-                    notify('warning', data.msg);
-                }
-            }).fail(function () {
-                notify('error', 'Unable to process request.');
-            });
-    }
-});
+$(document).on('click', '#do-proj-view-status', handler.projectViewSourceStatus);
 
 // --- CONTENT ANALYSIS :: STATISTICS ---
-$('#nav-ca-s').click(function () {
-    dataShowLoading();
-    $.ajax({
-        type: 'POST',
-        url: '/texthistory/content/statistic/',
-        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-        dataType: 'html'
-    }).done(function (data) {
-            changePage('Статистика данных',
-                [
-                    {id: 'sep', text: ''}
-                ],
-                data);
-        }).fail(function () {
-            notify('error', 'Unable to reach the server.');
-        });
-});
+$('#nav-ca-s').click(handler.caStatistics);
 
 // --- CONTENT ANALYSIS :: GRAPHICS ---
-$('#nav-ca-g').click(function () {
-    dataShowLoading();
-    $.ajax({
-        type: 'POST',
-        url: '/texthistory/content/graph/',
-        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-        dataType: 'html'
-    }).done(function (data) {
-            changePage('Графики распределенности',
-                [
-                    {id: 'sep', text: ''}
-                ],
-                data);
-        }).fail(function () {
-            notify('error', 'Unable to reach the server.');
-        });
-});
+$('#nav-ca-g').click(handler.caGraphics);
 
 // --- CONTENT ANALYSIS :: KEY LIST ---
-$('#nav-ca-t').click(function () {
-    dataShowLoading();
-    $.ajax({
-        type: 'POST',
-        url: '/texthistory/content/key/list/',
-        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-        dataType: 'html'
-    }).done(function (data) {
-            changePage('Ключевые слова/категории',
-                [
-                    {id: 'do-cont-key-list-view', text: 'Просмотреть'},
-                    {id: 'sep', text: ''}
-                ],
-                data);
-        }).fail(function () {
-            notify('error', 'Unable to reach the server.');
-        });
-});
+$('#nav-ca-t').click(handler.caKeyList);
 
 // --- CONTENT ANALYSIS :: KEY VIEW ---
-$(document).on('click', '#do-cont-key-list-view', function () {
-    var id = $($('input[name=id]:checked').get(0)).val();
-    if (id == null) {
-        notify('warning', 'Слово/категория не выбрана.');
-    } else {
-        dataShowLoading();
-        $.ajax({
-            type: 'POST',
-            url: '/texthistory/content/key/view/' + id + '/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'html'
-        }).done(function (data) {
-                changePage('Просмотр слова/категории',
-                    [
-                        {id: 'do-proj-view-exclude', text: 'Добавить в категорию'},
-                        {id: 'do-proj-view-status', text: 'Расформировать категорию'},
-                        {id: 'sep', text: ''}
-                    ],
-                    data);
-            }).fail(function () {
-                notify('error', 'Unable to reach the server.');
-            });
-    }
-});
+$(document).on('click', '#do-cont-key-list-view', handler.caKeyView);
 
