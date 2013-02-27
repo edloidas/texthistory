@@ -19,6 +19,7 @@ import org.edloidas.text.regex.Stemmer;
 import org.edloidas.text.words.content.Category;
 import org.edloidas.text.words.content.Concordance;
 import org.edloidas.text.words.content.KeyWord;
+import org.edloidas.text.words.content.Score;
 import org.edloidas.text.words.content.comparator.keyword.KeyWordReverseCountComparator;
 import org.edloidas.text.words.content.comparator.score.ScoreReverseCountComparator;
 import org.edloidas.text.words.discource.DiscourceGroup;
@@ -315,6 +316,7 @@ public class TextService {
                         // add right word to score in parent form
                         k = i + 1;
                         if (k < this.elements.size() && this.elements.get(k).getType() == TextElement.TYPE_WORD) {
+                            // WARNING: Scrores still must be calculated.
                             keyWord.addToScores(this.elements.get(k).getElement());
                         }
 
@@ -340,11 +342,24 @@ public class TextService {
             }
 
             // STEP 4 : MANAGE INDEXES AND RANKS ===============
+            int count; // common count
             Collections.sort(keyWords, new KeyWordReverseCountComparator());
             for (i = 0; i < keyWords.size(); i++) {
                 keyWord = keyWords.get(i);
                 keyWord.setId(i + 1);                 // the bigger count, the lower index.
                 keyWord.setRank(keyWords.size() - i); // the bigger count, the higher rank.
+
+                // Calculating z-score
+                for (Score score : keyWord.getScores()) {
+                    // TODO: Enhance alg. May be too slow.
+                    count = 0;
+                    for (TextElement element : this.elements) {
+                        if (score.getWord().equals(element.getElement())) {
+                            count++;
+                        }
+                    }
+                    score.calculate(count, keyWord.getCount(), this.wordsCount);
+                }
                 Collections.sort(keyWord.getScores(), new ScoreReverseCountComparator());
             }
 

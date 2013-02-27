@@ -136,6 +136,11 @@ function changePage(position, asideItems, data) {
     $('#content').html(data);
 }
 
+function changePage(position, data) {
+    $('#position').text(position);
+    $('#content').html(data);
+}
+
 //------------------------------------------------------------------------
 // LOCAL STORAGE AND SESSION
 //------------------------------------------------------------------------
@@ -147,6 +152,8 @@ var storage = new function () {
 //------------------------------------------------------------------------
 // TODO: Add GET requests. Add new object with functions and use predefined in events.
 var handler = new function () {
+    //==================================================
+    // LOGOUT ==========================================
     /** Handles logout POST request. */
     this.logout = function logout() {
         $.ajax({
@@ -167,6 +174,7 @@ var handler = new function () {
             });
     }
 
+    // HOME ============================================
     /** Navigates to Home page */
     this.home = function home() {
         dataShowLoading();
@@ -176,12 +184,13 @@ var handler = new function () {
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
             dataType: 'html'
         }).done(function (data) {
+                changePage('Главная', data);
             }).fail(function () {
                 notify('error', 'Unable to reach the server.');
             });
     }
 
-    /** Navigates to Home page */
+    /** Retrieves home-page data */
     this.homeData = function homeData() {
         dataShowLoading();
         $.ajax({
@@ -201,6 +210,168 @@ var handler = new function () {
                 notify('error', 'Unable to reach the server.');
             });
     }
+
+    // PROJECT =========================================
+    /** List of projects */
+    this.projectList = function projectList() {
+        dataShowLoading();
+        $.ajax({
+            type: 'GET',
+            url: '/texthistory/project/list/',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            dataType: 'html'
+        }).done(function (data) {
+                changePage('Список проектов', data);
+            }).fail(function () {
+                notify('error', 'Unable to reach the server.');
+            });
+    }
+    /** List of projects (DATA) */
+    this.projectListData = function projectListData() {
+        dataShowLoading();
+        $.ajax({
+            type: 'POST',
+            url: '/texthistory/project/list/',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            dataType: 'html'
+        }).done(function (data) {
+                changePage('Список проектов',
+                    [
+                        {id: 'do-proj-list-open', text: 'Сделать активным'},
+                        {id: 'do-proj-list-view', text: 'Просмотреть'},
+                        {id: 'do-proj-list-delete', text: 'Удалить'},
+                        {id: 'sep', text: ''}
+                    ],
+                    data);
+            }).fail(function () {
+                notify('error', 'Unable to reach the server.');
+            });
+    }
+
+    /** Open project */
+    this.projectOpen = function projectOpen() {
+        var id = $($('input[name=id]:checked').get(0)).val();
+
+        if (id == null) {
+            notify('warning', 'Проект не выбран.');
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/texthistory/project/open/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                dataType: 'json',
+                data: {"id": id}
+            }).done(function (data) {
+                    if (data.code == 3) {
+                        notify('success', data.msg);
+                        $('#cur-project').html(data.data);
+                    } else {
+                        notify('warning', data.msg);
+                    }
+                }).fail(function () {
+                    notify('error', 'Unable to process request.');
+                });
+        }
+    }
+
+    /** Delete project */
+    this.projectDelete = function projectDelete() {
+        var id = $($('input[name=id]:checked').get(0)).val();
+        var tr = $($('input[name=id]:checked').get(0)).parent().parent();
+
+        if (id == null) {
+            notify('warning', 'Проект не выбран.');
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/texthistory/project/delete/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                dataType: 'json',
+                data: {"id": id}
+            }).done(function (data) {
+                    if (data.code == 0 || data.code == 3) {
+                        notify('success', data.msg);
+                        $(tr).remove();
+                        if (data.code == 3) {
+                            $('#cur-project').text('Проект:');
+                        }
+                    } else {
+                        notify('warning', data.msg);
+                    }
+                }).fail(function () {
+                    notify('error', 'Unable to process request.');
+                });
+        }
+    }
+
+    // --- PROJECT :: NEW ---
+    /** Navigate to new project creation */
+    this.projectNew = function projectNew() {
+        dataShowLoading();
+        $.ajax({
+            type: 'GET',
+            url: '/texthistory/project/new/',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            dataType: 'html'
+        }).done(function (data) {
+                changePage('Новый проект', data);
+            }).fail(function () {
+                notify('error', 'Unable to reach the server.');
+            });
+    }
+    /** Retrieves new project creation page data*/
+    this.projectNewData = function projectNewData() {
+        dataShowLoading();
+        $.ajax({
+            type: 'POST',
+            url: '/texthistory/project/new/',
+            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+            dataType: 'html'
+        }).done(function (data) {
+                changePage('Новый проект',
+                    [
+                        {id: 'do-proj-new-clear', text: 'Очистить данные'},
+                        {id: 'sep', text: ''},
+                        {id: 'do-proj-new-save', text: 'Сохранить'},
+                        {id: 'sep', text: ''}
+                    ],
+                    data);
+            }).fail(function () {
+                notify('error', 'Unable to reach the server.');
+            });
+    }
+
+    /** Save new project */
+    this.projectNewSave = function projectNewSave() {
+        if ($('#project-new-name').val() == '') {
+            notify('warning', 'Название проекта не может быть пустым.');
+        } else {
+            $.ajax({
+                type: 'POST',
+                url: '/texthistory/project/new/save/',
+                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
+                dataType: 'json',
+                data: {"name": $('#project-new-name').val(),
+                    "desc": $('#project-new-desc').val()}
+            }).done(function (data) {
+                    if (data.code == 0) {
+                        notify('success', data.msg);
+                        $('#project-new-name').val('');
+                        $('#project-new-desc').val('');
+                    } else {
+                        notify('warning', data.msg);
+                    }
+                }).fail(function () {
+                    notify('error', 'Unable to process request.');
+                });
+        }
+    }
+
+    /** Clears new project form */
+    this.projectNewClear = function projectNewClear() {
+        $('#project-new-name').val('');
+        $('#project-new-desc').val('');
+    }
 }
 //------------------------------------------------------------------------
 // AJAX EVENTS
@@ -212,136 +383,18 @@ $('#logout').click(handler.logout);
 $('#nav-hm').click(handler.home);
 
 // --- PROJECT :: LIST ---
-$('#nav-pm-l').click(function () {
-    dataShowLoading();
-    $.ajax({
-        type: 'POST',
-        url: '/texthistory/project/list/',
-        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-        dataType: 'html'
-    }).done(function (data) {
-            changePage('Список проектов',
-                [
-                    {id: 'do-proj-list-open', text: 'Сделать активным'},
-                    {id: 'do-proj-list-view', text: 'Просмотреть'},
-                    {id: 'do-proj-list-delete', text: 'Удалить'},
-                    {id: 'sep', text: ''}
-                ],
-                data);
-        }).fail(function () {
-            notify('error', 'Unable to reach the server.');
-        });
-});
-
+$('#nav-pm-l').click(handler.projectList);
 // active
-$(document).on('click', '#do-proj-list-open', function () {
-    var id = $($('input[name=id]:checked').get(0)).val();
-
-    if (id == null) {
-        notify('warning', 'Проект не выбран.');
-    } else {
-        $.ajax({
-            type: 'POST',
-            url: '/texthistory/project/open/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'json',
-            data: {"id": id}
-        }).done(function (data) {
-                if (data.code == 3) {
-                    notify('success', data.msg);
-                    $('#cur-project').html(data.data);
-                } else {
-                    notify('warning', data.msg);
-                }
-            }).fail(function () {
-                notify('error', 'Unable to process request.');
-            });
-    }
-});
-
+$(document).on('click', '#do-proj-list-open', handler.projectOpen);
 // delete
-$(document).on('click', '#do-proj-list-delete', function () {
-    var id = $($('input[name=id]:checked').get(0)).val();
-    var tr = $($('input[name=id]:checked').get(0)).parent().parent();
-
-    if (id == null) {
-        notify('warning', 'Проект не выбран.');
-    } else {
-        $.ajax({
-            type: 'POST',
-            url: '/texthistory/project/delete/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'json',
-            data: {"id": id}
-        }).done(function (data) {
-                if (data.code == 0 || data.code == 3) {
-                    notify('success', data.msg);
-                    $(tr).remove();
-                    if (data.code == 3) {
-                        $('#cur-project').text('Проект:');
-                    }
-                } else {
-                    notify('warning', data.msg);
-                }
-            }).fail(function () {
-                notify('error', 'Unable to process request.');
-            });
-    }
-});
+$(document).on('click', '#do-proj-list-delete', handler.projectDelete);
 
 // --- PROJECT :: NEW ---
-$('#nav-pm-n').click(function () {
-    dataShowLoading();
-    $.ajax({
-        type: 'POST',
-        url: '/texthistory/project/new/',
-        contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-        dataType: 'html'
-    }).done(function (data) {
-            changePage('Новый проект',
-                [
-                    {id: 'do-proj-new-clear', text: 'Очистить данные'},
-                    {id: 'sep', text: ''},
-                    {id: 'do-proj-new-save', text: 'Сохранить'},
-                    {id: 'sep', text: ''}
-                ],
-                data);
-        }).fail(function () {
-            notify('error', 'Unable to reach the server.');
-        });
-});
-
+$('#nav-pm-n').click(handler.projectNew);
 // save
-$(document).on('click', '#do-proj-new-save', function () {
-    if ($('#project-new-name').val() == '') {
-        notify('warning', 'Название проекта не может быть пустым.');
-    } else {
-        $.ajax({
-            type: 'POST',
-            url: '/texthistory/project/new/save/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'json',
-            data: {"name": $('#project-new-name').val(),
-                "desc": $('#project-new-desc').val()}
-        }).done(function (data) {
-                if (data.code == 0) {
-                    notify('success', data.msg);
-                    $('#project-new-name').val('');
-                    $('#project-new-desc').val('');
-                } else {
-                    notify('warning', data.msg);
-                }
-            }).fail(function () {
-                notify('error', 'Unable to process request.');
-            });
-    }
-});
-
+$(document).on('click', '#do-proj-new-save', handler.projectNewSave);
 // clear
-$(document).on('click', '#do-proj-new-clear', function () {
-    $('#project-new-name').val('');
-    $('#project-new-desc').val('');
-});
+$(document).on('click', '#do-proj-new-clear', handler.projectNewClear);
 
 // --- PROJECT :: VIEW ---
 // list view
