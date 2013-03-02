@@ -72,12 +72,13 @@ public class ProjectController {
      *
      * @return {@code String}, that represents view.
      */
-    @RequestMapping(value = "/list", method = RequestMethod.POST,
+    @RequestMapping(value = "/list", method = RequestMethod.GET,
             produces = "application/json; charset=utf-8")
     public String projectList(Model model) {
         try {
-            if (!userSession.isLogged())
+            if (!userSession.isLogged()) {
                 return "index";
+            }
 
             List<Project> projects;
             int count;
@@ -103,12 +104,13 @@ public class ProjectController {
      *
      * @return {@code String}, that represents view.
      */
-    @RequestMapping(value = "/new", method = RequestMethod.POST,
+    @RequestMapping(value = "/new", method = RequestMethod.GET,
             produces = "application/json; charset=utf-8")
     public String projectNew(Model model) {
         try {
-            if (!userSession.isLogged())
+            if (!userSession.isLogged()) {
                 return "index";
+            }
 
             model.addAttribute("sessionUser", userSession.getUser().getName());
             model.addAttribute("sessionProject", userSession.getProject().getName());
@@ -133,8 +135,9 @@ public class ProjectController {
     String projectAdd(@RequestParam(value = "name", required = true) String name,
                       @RequestParam(value = "desc", required = true) String desc) {
         try {
-            if (!userSession.isLogged())
+            if (!userSession.isLogged()) {
                 return "{\"code\":2,\"msg\":\"Access denied.\",\"data\":\"User has no rights to do this.\"}";
+            }
 
             JsonData json;
 
@@ -162,8 +165,9 @@ public class ProjectController {
     @ResponseBody
     String projectDelete(@RequestParam(value = "id", required = true) String id) {
         try {
-            if (!userSession.isLogged())
+            if (!userSession.isLogged()) {
                 return "{\"code\":2,\"msg\":\"Access denied.\",\"data\":\"User has no rights to do this.\"}";
+            }
 
             JsonData json;
 
@@ -206,14 +210,15 @@ public class ProjectController {
     @ResponseBody
     String projectOpen(@RequestParam(value = "id", required = true) String id) {
         try {
-            if (!userSession.isLogged())
+            if (!userSession.isLogged()) {
                 return "{\"code\":2,\"msg\":\"Access denied.\",\"data\":\"User has no rights to do this.\"}";
+            }
 
             JsonData json;
             Project project = projectService.getById(new Project(Integer.parseInt(id)));
             if (userSession.setProject(project)) {
                 json = new JsonData(3, "Project with name [" + project.getName() + "] opened.", project.getName());
-                userSession.setUpdateText(true);
+                userSession.setTextUpdated(false);
             } else {
                 json = new JsonData(2, "Project can not be opened.", "Something goes wrong.");
             }
@@ -230,14 +235,16 @@ public class ProjectController {
      * @return {@code String}, that represents text response of operation status.
      */
     /* Using mapping produces = "application/json; charset=utf-8" is highly recommended.
-    *  In other case you will have bad Response with ISO character encoding. */
-    @RequestMapping(value = "/view/{projectId}", method = RequestMethod.POST,
+    *  In other case you will have bad Response with ISO character encoding.
+    *  TODO: Add view by name for mapping '/view/name/{projectName}+' */
+    @RequestMapping(value = "/view/{projectId}", method = RequestMethod.GET,
             produces = "application/json; charset=utf-8")
     public String projectView(@PathVariable("projectId") String projectId,
                               Model model) {
         try {
-            if (!userSession.isLogged())
+            if (!userSession.isLogged()) {
                 return "index";
+            }
 
             Project project;
             List<Source> sources;
@@ -283,8 +290,9 @@ public class ProjectController {
                          @RequestParam(value = "name", required = true) String name,
                          @RequestParam(value = "desc", required = true) String desc) {
         try {
-            if (!userSession.isLogged())
+            if (!userSession.isLogged()) {
                 return "{\"code\":2,\"msg\":\"Access denied.\",\"data\":\"User has no rights to do this.\"}";
+            }
 
             JsonData json;
             Project project = projectService.getById(new Project(Integer.parseInt(id)));
@@ -320,14 +328,9 @@ public class ProjectController {
     String projectFileUpload(@PathVariable("projectId") String id,
                              @RequestParam(value = "file", required = true) CommonsMultipartFile file) {
         try {
-            if (!userSession.isLogged())
+            if (!userSession.isLogged()) {
                 return "{\"code\":2,\"msg\":\"Access denied.\",\"data\":\"User has no rights to do this.\"}";
-
-            //Project project = (Project) projectService.getById(new Project(Integer.parseInt(id)));
-
-            //String filePath = "C:/" + orgName;
-            //File dest = new File(filePath);
-            //file.transferTo(dest);
+            }
 
             BufferedReader in = new BufferedReader(new InputStreamReader(file.getInputStream()));
             StringBuilder sb = new StringBuilder();
@@ -350,9 +353,7 @@ public class ProjectController {
             Project project = projectService.getById(new Project(Integer.parseInt(id)));
             Source src = new Source(file.getOriginalFilename(), text, md5Number.toString(16), project);
             sourceService.addEntity(src);
-            //LOGGER.info(file.getFileItem().getString("UTF-8"));
-            //LOGGER.info(sb.toString());
-            userSession.setUpdateText(true);
+            userSession.setTextUpdated(false);
 
             return new JsonData(3, "File [" + file.getOriginalFilename() + "] uploaded with total size of " + file.getSize() + " Bytes.", "Total size: " + file.getSize()).toString();
         } catch (Exception ex) {

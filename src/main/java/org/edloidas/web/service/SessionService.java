@@ -32,7 +32,7 @@ public class SessionService {
     /** Log status indicator */
     private boolean logged;
     /** Log status indicator */
-    private boolean updateText;
+    private boolean textUpdated;
 
     /** Basic constructor. Set all field to "none" string. */
     public SessionService() {
@@ -41,7 +41,7 @@ public class SessionService {
         project.setId(-1);
         project.setName("не выбран");
         logged = false;
-        updateText = true;
+        textUpdated = false;
     }
 
     /**
@@ -102,12 +102,12 @@ public class SessionService {
         this.logged = logged;
     }
 
-    public boolean isUpdateText() {
-        return updateText;
+    public boolean isTextUpdated() {
+        return textUpdated;
     }
 
-    public void setUpdateText(boolean updateText) {
-        this.updateText = updateText;
+    public void setTextUpdated(boolean textUpdated) {
+        this.textUpdated = textUpdated;
     }
 
     /**
@@ -132,7 +132,7 @@ public class SessionService {
                 if (pass1.compareTo(pass2) == 0) {
                     this.user = db;
                     this.logged = true;
-                    this.updateText = true;
+                    this.textUpdated = false;
                     closeProject();
                     return true;
                 } else {
@@ -157,7 +157,7 @@ public class SessionService {
             this.project = new Project();
             this.project.setId(-1);
             this.project.setName("не выбран");
-            this.updateText = true;
+            this.textUpdated = false;
         } catch (Exception ex) {
             LOGGER.info(ex.getMessage());
             return false;

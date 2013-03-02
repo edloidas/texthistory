@@ -8,3 +8,7 @@
 # Directories #
 target/
 sql/
+
+# IDEA Project #
+*.iml
+*.iws

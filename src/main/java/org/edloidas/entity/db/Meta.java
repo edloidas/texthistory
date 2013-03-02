@@ -12,6 +12,7 @@ import java.sql.Timestamp;
  * @author edloidas@gmail.com
  * @since JPA 2.0
  */
+// TODO: Implement Meta for db, or delete, if it's not needed anymore.
 @Entity
 @Table(name = "meta")
 public class Meta implements CommonEntity {

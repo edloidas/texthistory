@@ -5,19 +5,20 @@ import org.apache.log4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 
+/*TODO: Update class evaluations. Not finished. */
 public class Category {
 
     /** Common logger. */
     private static final Logger LOGGER = Logger.getLogger(KeyWord.class);
 
     /** Word identifier */
-    private int id;
+    private int id; // Should begin from 0
 
     /** Equals to first word name */
     private String name;
 
     /** Rank is equals to index */
-    private int rank;
+    private int rank; // Should begin from 1
 
     /** Average weighted index. */
     // AVERAGE == SUMM(word.rank * word.count) / SUMM(word.count)
@@ -43,8 +44,9 @@ public class Category {
         this.name = word.getName();
         this.rank = 0;
         this.average = 0.0d;
-        this.count = 1;
+        this.count = word.getCount();
         this.frequency = 0.0d;
+        // intervals should be generated on update
         this.keyWords = new ArrayList<>();
         this.keyWords.add(word);
     }
@@ -98,12 +100,24 @@ public class Category {
         this.frequency = frequency;
     }
 
+    public List<Integer> getIntervals() {
+        return intervals;
+    }
+
+    public void setIntervals(List<Integer> intervals) {
+        this.intervals = intervals;
+    }
+
     public List<KeyWord> getKeyWords() {
         return keyWords;
     }
 
     public void setKeyWords(List<KeyWord> keyWords) {
         this.keyWords = keyWords;
+    }
+
+    public int getSize() {
+        return keyWords.size();
     }
 
     // Static tools
@@ -199,12 +213,24 @@ public class Category {
     public void refresh(int wordsCount) {
         int rangScore = 0;
         int totalCount = 0;
+
+        this.intervals = new ArrayList<>();
+        this.count = 0;
+
         for (KeyWord word : this.keyWords) {
             rangScore += word.getCount() * word.getRank();
             totalCount = word.getCount();
-        }
-        this.average = (double) ((int) ((double) rangScore / (double) totalCount * 10000)) / 100.0d;
 
+            for (int i = 0; i < word.getIntervals().size(); i++) {
+                if (i >= this.intervals.size()) {
+                    this.intervals.add(word.getIntervals().get(i));
+                } else {
+                    this.intervals.set(i, this.intervals.get(i) + word.getIntervals().get(i));
+                }
+            }
+            this.count += word.getCount();
+        }
+        this.average = (double) ((int) ((double) rangScore / (double) totalCount * 100)) / 100.0d;
         this.frequency = (double) ((int) ((double) totalCount / (double) wordsCount * 10000)) / 100.0d;
     }
 }

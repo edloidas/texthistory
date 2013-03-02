@@ -103,10 +103,10 @@ public class TextService {
     //------------------------------------------------------------------------
 
     /** Text representation as elements. */
-    private List<TextElement> elements = new ArrayList<>();
+    private List<TextElement> elements = null;
 
     /** Key words / categories. */
-    private List<Category> categories = new ArrayList<>();
+    private List<Category> categories = null;
 
     /** Discource blocks groupss. */
     private List<DiscourceGroup> discourceGroups = null;
@@ -252,11 +252,12 @@ public class TextService {
                     // Mark words with very high frequency or/and low
                     // Words with default frequency will not be processed in future.
                     if (elem.getFrequency() > 1000.0d
-                            || elem.getFrequency() < 0.9d) {
-                        elem.setFrequency(0.0d);
+                            || elem.getFrequency() < 1.0d) {
+                        //elem.setFrequency(0.0d);
                         this.elements.add(elem);
                         continue;
                     }
+                    elem.setType(TextElement.TYPE_SPECIAL);
 
                     // STEP 1.4 : SINONYMS CHECK========================
                     // TODO: Re-write this part. Dictionary is not well implemented.
@@ -276,69 +277,82 @@ public class TextService {
                 this.elements.add(elem);
             }
 
-
             // STEP 2 : SETTING METADATA VALID VALUES =========
             this.wordsLength = this.wordsLength / this.wordsCount;
 
 
             // STEP 3 : MANAGE CATEGORIES / KEY WORDS ==========
             int i, j, k;
+            int wordIndex = 0;
             StringBuilder before, after;
             for (i = 0; i < this.elements.size(); i++) {
                 elem = this.elements.get(i);
-                for (j = 0; j < keyWords.size(); j++) {
-                    if (keyWords.get(j).getName().equals(elem.getElement())) {
+
+                if (elem.getType() > TextElement.TYPE_SYMBOL) {
+                    wordIndex++;
+                }
+
+                if (elem.getType() == TextElement.TYPE_SPECIAL) { // Element is a word with frequency of the key word
+                    for (j = 0; j < keyWords.size(); j++) {
+                        if (keyWords.get(j).getName().equals(elem.getElement())) {
+                            break;
+                        }
+                    }
+
+                    if (j == keyWords.size()) { // no such word in element list
+                        keyWord = new KeyWord(i, elem.getElement());
+                        for (k = 0; k < intervalsCount; k++) {
+                            keyWord.getIntervals().add(0);
+                        }
+                        keyWords.add(keyWord);
+                        //this.keyCount++;
+                    } else {
                         keyWord = keyWords.get(j);
+                    }
 
-                        // Concordance =====================================
-                        before = new StringBuilder();
-                        after = new StringBuilder();
-                        for (k = i - 1; k >= 0; k--) {
-                            if (this.elements.get(k).getType() != TextElement.TYPE_WORD) {
-                                break;
-                            }
-                            before.insert(0, " ").insert(0, this.elements.get(k).getOriginal());
-                        }
-                        for (k = i + 1; k < this.elements.size(); k++) {
-                            if (this.elements.get(k).getType() != TextElement.TYPE_WORD) {
-                                break;
-                            }
-                            before.append(" ").append(this.elements.get(k).getOriginal());
-                        }
-                        keyWord.addConcordance(new Concordance(before.toString(), after.toString()));
 
-                        // Score ===========================================
-                        // add left word to score in parent form
-                        k = i - 1;
-                        if (k >= 0 && this.elements.get(k).getType() == TextElement.TYPE_WORD) {
-                            keyWord.addToScores(this.elements.get(k).getElement());
+                    // Concordance =====================================
+                    before = new StringBuilder();
+                    after = new StringBuilder();
+                    for (k = i - 1; k >= 0; k--) {
+                        if (this.elements.get(k).getType() < TextElement.TYPE_WORD
+                                || (i - k > 5)) {
+                            break;
                         }
-                        // add right word to score in parent form
-                        k = i + 1;
-                        if (k < this.elements.size() && this.elements.get(k).getType() == TextElement.TYPE_WORD) {
-                            // WARNING: Scrores still must be calculated.
-                            keyWord.addToScores(this.elements.get(k).getElement());
+                        before.insert(0, " ").insert(0, this.elements.get(k).getOriginal());
+                    }
+                    for (k = i + 1; k < this.elements.size(); k++) {
+                        if (this.elements.get(k).getType() < TextElement.TYPE_WORD
+                                || (k - i > 5)) {
+                            break;
                         }
+                        after.append(" ").append(this.elements.get(k).getOriginal());
+                    }
+                    keyWord.addConcordance(new Concordance(before.toString(), after.toString(), elem.getOriginal()));
 
-                        // Intervals =======================================
-                        k = (int) (((double) i / (double) this.wordsCount) * intervalsCount);
-                        try {
-                            keyWord.getIntervals().set(k, keyWord.getIntervals().get(k) + 1);
-                        } catch (IndexOutOfBoundsException indexEx) {
-                            LOGGER.warn(indexEx.getMessage(), indexEx);
-                        }
+                    // Score ===========================================
+                    // add left word to score in parent form
+                    k = i - 1;
+                    if (k >= 0 && this.elements.get(k).getType() == TextElement.TYPE_SPECIAL) {
+                        keyWord.addToScores(this.elements.get(k).getElement());
+                    }
+                    // add right word to score in parent form
+                    k = i + 1;
+                    if (k < this.elements.size() && this.elements.get(k).getType() == TextElement.TYPE_SPECIAL) {
+                        // WARNING: Scrores still must be calculated.
+                        keyWord.addToScores(this.elements.get(k).getElement());
+                    }
 
-                        break;
+                    // Intervals =======================================
+                    //k = (int) (((double) i / (double) this.wordsCount) * intervalsCount); // correct form, incorrect k
+                    k = (int) (((double) wordIndex / (double) this.elements.size()) * intervalsCount); // wrong form
+                    try {
+                        keyWord.getIntervals().set(k, keyWord.getIntervals().get(k) + 1);
+                    } catch (IndexOutOfBoundsException indexEx) {
+                        LOGGER.warn(indexEx.getMessage(), indexEx);
                     }
                 }
-                if (i == keyWords.size()) { // no such word in element list
-                    keyWord = new KeyWord(i, elem.getElement());
-                    for (k = 0; k < intervalsCount; k++) {
-                        keyWord.getIntervals().add(new Integer(0));
-                    }
-                    keyWords.add(keyWord);
-                }
-                this.keyCount++;
+
             }
 
             // STEP 4 : MANAGE INDEXES AND RANKS ===============
@@ -348,6 +362,8 @@ public class TextService {
                 keyWord = keyWords.get(i);
                 keyWord.setId(i + 1);                 // the bigger count, the lower index.
                 keyWord.setRank(keyWords.size() - i); // the bigger count, the higher rank.
+                keyWord.setCount(keyWord.getConcordances().size());
+                this.keyCount += keyWord.getConcordances().size();
 
                 // Calculating z-score
                 for (Score score : keyWord.getScores()) {
@@ -365,9 +381,8 @@ public class TextService {
 
             for (i = 0; i < keyWords.size(); i++) {
                 category = new Category(keyWords.get(i));
-                category.setId(i + 1);
+                category.setId(i);
                 category.setRank(i + 1);
-                k = (int) (((double) i / (double) this.wordsCount) * intervalsCount);
                 category.refresh(this.keyCount); // Set frequency and average
                 this.categories.add(category);
             }
@@ -381,43 +396,58 @@ public class TextService {
     // GETTERS AND SETTERS
     //------------------------------------------------------------------------
 
-    // FICTIVE
-
-    /*public List<Concordance> getConcordance(int id) {
+    // Fictitious methods ==============================
+    public float getKeyPercentage() {
+        float percentage = 0.0f;
         try {
-            if (meanWords.size() > id) {
-                ArrayList<Concordance> cons = new ArrayList<Concordance>();
-                StringBuilder before, after;
-                String word;
-                String mean = meanWords.get(id).getName();
-                int i, j;
-                for (i = 0; i < elements.size(); i++) {
-                    word = elements.get(i).getElement();
-                    if (mean.equalsIgnoreCase(word)) {
-                        word = elements.get(i).getOriginal();
-                        before = new StringBuilder();
-                        after = new StringBuilder();
-
-                        j = i - 1;
-                        while ((j > 0) && (elements.get(j).getType() > TextElement.TYPE_SYMBOL)) {
-                            before.insert(0, elements.get(j).getOriginal()).insert(0, " ");
-                            j--;
-                        }
-                        j = i + 1;
-                        while ((j < elements.size()) && (elements.get(j).getType() > TextElement.TYPE_SYMBOL)) {
-                            after.append(" ").append(elements.get(j).getOriginal());
-                            j++;
-                        }
-                        cons.add(new Concordance(before.toString(), word, after.toString()));
-                    }
-                }
-                return cons;
-            }
+            // Transform into number with 2 digits after dot: '12.34' %
+            percentage = (float)((int)(((float)this.keyCount / (float)this.wordsCount) * 10000)) / 100.0f;
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
         }
-        return new ArrayList<Concordance>();
-    }*/
+        return percentage;
+    }
+
+    public int getWordsCount() {
+        return wordsCount;
+    }
+
+    public void setWordsCount(int wordsCount) {
+        this.wordsCount = wordsCount;
+    }
+
+    public int getKeyCount() {
+        return keyCount;
+    }
+
+    public void setKeyCount(int keyCount) {
+        this.keyCount = keyCount;
+    }
+
+    public int getWordsLength() {
+        return wordsLength;
+    }
+
+    public void setWordsLength(int wordsLength) {
+        this.wordsLength = wordsLength;
+    }
+
+    public List<TextElement> getElements() {
+        return elements;
+    }
+
+    public void setElements(List<TextElement> elements) {
+        this.elements = elements;
+    }
+
+    public List<Category> getCategories() {
+        return categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
+
 
     // ORIGINAL
 

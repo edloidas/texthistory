@@ -101,26 +101,6 @@ public class HomeController {
 
             model.addAttribute("sessionUser", userSession.getUser().getName());
             model.addAttribute("sessionProject", userSession.getProject().getName());
-            return "base.definition";
-        } catch (Exception ex) {
-            LOGGER.error("Server error.", ex);
-            return "index";
-        }
-    }
-
-    /**
-     * Handles access to home section.
-     *
-     * @return {@code String}, that represents text response of operation success.
-     */
-    @RequestMapping(value = "/home", method = RequestMethod.POST)
-    String home(Model model) {
-        try {
-            if (!userSession.isLogged())
-                throw new Exception("Access denied. User not authorized.");
-
-            model.addAttribute("sessionUser", userSession.getUser().getName());
-            model.addAttribute("sessionProject", userSession.getProject().getName());
             return "home";
         } catch (Exception ex) {
             LOGGER.error("Server error.", ex);

@@ -13,7 +13,7 @@
 
         <junit.version>4.10</junit.version>
         <log4j.version>1.2.17</log4j.version>
-        <slf4j.version>1.5.8</slf4j.version>
+        <slf4j.version>1.7.2</slf4j.version>
 
         <spring.version>3.1.1.RELEASE</spring.version>
 
@@ -34,7 +34,11 @@
         <hibernate.version>4.1.4.Final</hibernate.version>
 
         <mvn.resource.plugin.version>2.6</mvn.resource.plugin.version>
+        <mvn.compiler.plugin.version>3.0</mvn.compiler.plugin.version>
+
         <mvn.encoding>UTF-8</mvn.encoding>
+        <mvn.source>1.7</mvn.source>
+        <mvn.target>1.7</mvn.target>
     </properties>
 
     <dependencies>
@@ -231,6 +235,15 @@
                 <version>${mvn.resource.plugin.version}</version>
                 <configuration>
                     <encoding>${mvn.encoding}</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${mvn.compiler.plugin.version}</version>
+                <configuration>
+                    <source>${mvn.source}</source>
+                    <target>${mvn.target}</target>
                 </configuration>
             </plugin>
         </plugins>

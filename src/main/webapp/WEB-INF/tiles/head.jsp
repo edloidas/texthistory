@@ -5,7 +5,6 @@
 <link rel="stylesheet" href="<c:url value="/resources/css/style.css" />" type="text/css">
 <link rel="stylesheet" href="<c:url value="/resources/css/tipTip.css" />" type="text/css">
 <script src="<c:url value="/resources/js/jquery-1.9.0.min.js" />"></script>
-<script src="<c:url value="/resources/js/jquery-ui-1.10.0.custom.min.js" />"></script>
 <!-- TipTip -->
 <script src="<c:url value="/resources/js/tiptip/jquery.tipTip.js" />"></script>
 <!-- Noty -->
@@ -15,4 +14,4 @@
 <!-- Raphael and GRaphael -->
 <script src="<c:url value="/resources/js/raphael/raphael-min.js" />"></script>
 <script src="<c:url value="/resources/js/raphael/g.raphael-min.js" />"></script>
-<script src="<c:url value="/resources/js/raphael/g.dot-min.js" />"></script>
+<script src="<c:url value="/resources/js/raphael/g.bar-min.js" />"></script>

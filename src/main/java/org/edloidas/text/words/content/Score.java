@@ -88,9 +88,9 @@ public class Score {
      */
     public void calculate(int totalCount, int neighborCount, int wordsCount) {
         try {
-            int S = 2;
-            double p = totalCount / (wordsCount - neighborCount);
-            double E = p * neighborCount * S;
+            double S = 2.0d;
+            double p = (double) totalCount / (double) (wordsCount - neighborCount);
+            double E = p * (double) neighborCount * S;
             double q = 1.0d - p;
             this.score =  Math.pow(Math.abs(((double)this.count - E)), (E * q));
         } catch (Exception ex) {

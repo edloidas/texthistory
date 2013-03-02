@@ -80,7 +80,7 @@ public class SourceController {
 
             if (userSession.getProject().getName().equals(prj.getName()) // deleting from opened project
                     && src.getStatus()) {                      // source was active
-                userSession.setUpdateText(true);
+                userSession.setTextUpdated(false);
             }
 
             sourceService.deleteEntity(new Source(Integer.parseInt(id)));
@@ -120,7 +120,7 @@ public class SourceController {
             sourceService.updateEntity(src);
 
             // TODO: Check if updated source refer to opened project.
-            userSession.setUpdateText(true);
+            userSession.setTextUpdated(false);
 
             json = new JsonData(3, "Source [" + src.getName() + "] status was changed.", src.getStatus().toString());
 

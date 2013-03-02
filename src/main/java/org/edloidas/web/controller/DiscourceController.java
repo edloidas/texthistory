@@ -92,7 +92,7 @@ public class DiscourceController {
                 return navaigateToProjects(model);
             }
 
-            if (userSession.isUpdateText()) {
+            if (userSession.isTextUpdated()) {
                 List<Source> sources = sourceService.getAll(new Source(userSession.getProject()));
                 StringBuilder sb = new StringBuilder();
 
@@ -101,7 +101,7 @@ public class DiscourceController {
                         sb.append(src.getText()).append("\n");
                 }
 
-                userSession.setUpdateText(false);
+                userSession.setTextUpdated(false);
                 textService.doUpdate(sb.toString());
             }
 

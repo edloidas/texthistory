@@ -78,15 +78,12 @@ public class ContentController {
      *
      * @return {@code String}, that represents text response of operation success.
      */
-    @RequestMapping(value = "/statistic", method = RequestMethod.POST)
+    @RequestMapping(value = "/statistic", method = RequestMethod.GET)
     String content(Model model) {
         try {
             if (!userSession.isLogged()) {
                 throw new Exception("Access denied. User not authorized.");
             }
-
-            model.addAttribute("sessionUser", userSession.getUser().getName());
-            model.addAttribute("sessionProject", userSession.getProject().getName());
 
             if (userSession.getProject().getId() == -1) {
                 return "no-project";
@@ -101,17 +98,15 @@ public class ContentController {
             }
 
             model.addAttribute("text", sb.toString());
-
-            if (userSession.isUpdateText()) {
-                userSession.setUpdateText(false);
+            if (!userSession.isTextUpdated()) {
                 textService.doUpdate(sb.toString());
+                userSession.setTextUpdated(true);
             }
 
-            float water = (1 - (float) textService.getMeanCount()
-                    / (float) textService.getWordsCount()) * 100;
+            float water = (100.0f - textService.getKeyPercentage());
             model.addAttribute("textWordsCount", textService.getWordsCount());
             model.addAttribute("textWordsLength", textService.getWordsLength());
-            model.addAttribute("textMeanCount", textService.getMeanCount());
+            model.addAttribute("textKeyCount", textService.getKeyCount());
             model.addAttribute("textWater", water);
 
             return "content-statistic";
@@ -126,23 +121,33 @@ public class ContentController {
      *
      * @return {@code String}, that represents text response of operation success.
      */
-    @RequestMapping(value = "/key/list", method = RequestMethod.POST)
+    @RequestMapping(value = "/key/list", method = RequestMethod.GET)
     String contentKeyList(Model model) {
         try {
             if (!userSession.isLogged()) {
                 throw new Exception("Access denied. User not authorized.");
             }
 
-            model.addAttribute("sessionUser", userSession.getUser().getName());
-            model.addAttribute("sessionProject", userSession.getProject().getName());
-
             if (userSession.getProject().getId() == -1) {
                 return "no-project";
             }
             // TODO : if there is too many key words - suggest to group them into categories.
 
-            model.addAttribute("keyWords", textService.getKeyWords());
-            model.addAttribute("count", textService.getKeyWords().size());
+            if (!userSession.isTextUpdated()) {
+                List<Source> sources = sourceService.getAll(new Source(userSession.getProject()));
+                StringBuilder sb = new StringBuilder();
+
+                for (Source src : sources) {
+                    if (src.getStatus())
+                        sb.append(src.getText()).append("\n");
+                }
+
+                textService.doUpdate(sb.toString());
+                userSession.setTextUpdated(true);
+            }
+
+            model.addAttribute("categories", textService.getCategories());
+            model.addAttribute("count", textService.getCategories().size());
 
             return "content-key-list";
         } catch (Exception ex) {
@@ -158,7 +163,7 @@ public class ContentController {
      */
     /* Using mapping produces = "application/json; charset=utf-8" is highly recommended.
     *  In other case you will have bad Response with ISO character encoding. */
-    @RequestMapping(value = "/key/view/{keyId}", method = RequestMethod.POST,
+    @RequestMapping(value = "/key/view/{keyId}", method = RequestMethod.GET,
             produces = "application/json; charset=utf-8")
     public String contentMeaningfulView(@PathVariable("keyId") String keyId,
                                         Model model) {
@@ -167,28 +172,32 @@ public class ContentController {
                 throw new Exception("Access denied. User not authorized.");
             }
 
-            model.addAttribute("sessionUser", userSession.getUser().getName());
-            model.addAttribute("sessionProject", userSession.getProject().getName());
-
             if (userSession.getProject().getId() == -1) {
                 return "no-project";
             }
 
             int id = Integer.parseInt(keyId);
-            List<Concordance> cons = textService.getConcordance(id);
-            int count = cons.size();
-            String word = "";
 
-            if (id < textService.getMeanWords().size()) {
-                word = textService.getMeanWords().get(id).getName();
+            if (!userSession.isTextUpdated()) {
+                List<Source> sources = sourceService.getAll(new Source(userSession.getProject()));
+                StringBuilder sb = new StringBuilder();
+
+                for (Source src : sources) {
+                    if (src.getStatus())
+                        sb.append(src.getText()).append("\n");
+                }
+
+                textService.doUpdate(sb.toString());
+                userSession.setTextUpdated(true);
             }
 
-            model.addAttribute("cons", cons);
-            model.addAttribute("count", count);
-            model.addAttribute("word", word);
-            model.addAttribute("id", id);
+            //model.addAttribute("categories", textService.getCategories()); // For future use: merging categories
+            model.addAttribute("category", textService.getCategories().get(id));
+            model.addAttribute("keys", textService.getCategories().get(id).getKeyWords());
 
             return "content-key-view";
+        } catch (IndexOutOfBoundsException ex) {
+            return "no-index";
         } catch (Exception ex) {
             LOGGER.error("Server error.", ex);
             return "not-authorized";
@@ -200,22 +209,34 @@ public class ContentController {
      *
      * @return {@code String}, that represents text response of operation success.
      */
-    @RequestMapping(value = "/graph", method = RequestMethod.POST)
+    @RequestMapping(value = "/graph", method = RequestMethod.GET)
     String contentMeaningfulGraph(Model model) {
         try {
             if (!userSession.isLogged()) {
                 throw new Exception("Access denied. User not authorized.");
             }
 
-            model.addAttribute("sessionUser", userSession.getUser().getName());
-            model.addAttribute("sessionProject", userSession.getProject().getName());
-
             if (userSession.getProject().getId() == -1) {
                 return "no-project";
             }
 
-            model.addAttribute("meanWords", textService.getMeanWords());
-            model.addAttribute("count", textService.getMeanWords().size());
+            List<Source> sources = sourceService.getAll(new Source(userSession.getProject()));
+            StringBuilder sb = new StringBuilder();
+
+            for (Source src : sources) {
+                if (src.getStatus())
+                    sb.append(src.getText()).append("\n");
+            }
+
+            model.addAttribute("text", sb.toString());
+
+            if (!userSession.isTextUpdated()) {
+                textService.doUpdate(sb.toString());
+                userSession.setTextUpdated(true);
+            }
+
+            model.addAttribute("categories", textService.getCategories());
+            model.addAttribute("count", textService.getCategories().size());
 
             return "content-graph";
         } catch (Exception ex) {
@@ -223,202 +244,4 @@ public class ContentController {
             return "not-authorized";
         }
     }
-
-    /**
-     * Handles access to content section.
-     *
-     * @return {@code String}, that represents text response of operation success.
-     */
-//    @RequestMapping(value = "/key/list", method = RequestMethod.GET)
-//    String contentKeyList(Model model) {
-//        try {
-//            if (!userSession.isLogged()) {
-//                throw new Exception("Access denied. User not authorized.");
-//            }
-//
-//            model.addAttribute("sessionUser", userSession.getUser().getName());
-//            model.addAttribute("sessionProject", userSession.getProject().getName());
-//
-//            if (userSession.getProject().getId() == -1) {
-//                return "no-project";
-//            }
-//
-//            model.addAttribute("keyWords", textService.getKeyWords());
-//            model.addAttribute("count", textService.getKeyWords().size());
-//
-//            return "content-key-list";
-//        } catch (Exception ex) {
-//            LOGGER.error("Server error.", ex);
-//            return "not-authorized";
-//        }
-//    }
-
-    /**
-     * Handles and retrieves the AJAX request for adding new key word.
-     *
-     * @return {@code String}, that represents text response of operation status.
-     */
-//    @RequestMapping(value = "/key/add", method = RequestMethod.POST,
-//            produces = "application/json; charset=utf-8")
-//    public
-//    @ResponseBody
-//    String contentKeyAdd(@RequestParam(value = "name", required = true) String name) {
-//        try {
-//            if (!userSession.isLogged())
-//                return "{\"code\":2,\"msg\":\"Access denied.\",\"data\":\"You have no rights to do this.\"}";
-//
-//            JsonData json;
-//            int id = 0;
-//            if (textService.getKeyWords().size() > 0) {
-//                id = textService.getKeyWords().get(textService.getKeyWords().size() - 1).getId() + 1;
-//            }
-//            textService.getKeyWords().add(new KeyWord(id, name));
-//
-//            json = new JsonData(0, "Category added.", name);
-//
-//            return json.toString();
-//        } catch (Exception ex) {
-//            LOGGER.info(ex.getMessage());
-//            return "{\"code\":1,\"msg\":\"Server error.\",\"data\":\"See server log.\"}";
-//        }
-//    }
-
-    /**
-     * Handles and retrieves the AJAX request for adding new key word.
-     *
-     * @return {@code String}, that represents text response of operation status.
-     */
-//    @RequestMapping(value = "/key/delete", method = RequestMethod.POST,
-//            produces = "application/json; charset=utf-8")
-//    public
-//    @ResponseBody
-//    String contentKeyDelete(@RequestParam(value = "id", required = true) String keyId) {
-//        try {
-//            if (!userSession.isLogged())
-//                return "{\"code\":2,\"msg\":\"Access denied.\",\"data\":\"You have no rights to do this.\"}";
-//
-//            JsonData json;
-//            int id = Integer.parseInt(keyId);
-//            json = new JsonData(0, "Category not found.", keyId);
-//
-//            for (int i = 0; i < textService.getKeyWords().size(); i++) {
-//                if (textService.getKeyWords().get(i).getId() == id) {
-//                    textService.getKeyWords().remove(i);
-//                    json = new JsonData(0, "Category deleted.", keyId);
-//                    break;
-//                }
-//            }
-//
-//            return json.toString();
-//        } catch (Exception ex) {
-//            LOGGER.info(ex.getMessage());
-//            return "{\"code\":1,\"msg\":\"Server error.\",\"data\":\"See server log.\"}";
-//        }
-//    }
-
-    /**
-     * Handles and retrieves the AJAX request for viewing key words.
-     *
-     * @return {@code String}, that represents text response of operation status.
-     */
-    /* Using mapping produces = "application/json; charset=utf-8" is highly recommended.
-    *  In other case you will have bad Response with ISO character encoding. */
-//    @RequestMapping(value = "/key/view/{keyId}", method = RequestMethod.GET,
-//            produces = "application/json; charset=utf-8")
-//    public String contentKeyView(@PathVariable("keyId") String keyId,
-//                                        Model model) {
-//        try {
-//            if (!userSession.isLogged()) {
-//                throw new Exception("Access denied. User not authorized.");
-//            }
-//
-//            model.addAttribute("sessionUser", userSession.getUser().getName());
-//            model.addAttribute("sessionProject", userSession.getProject().getName());
-//
-//            if (userSession.getProject().getId() == -1) {
-//                return "no-project";
-//            }
-//
-//            int id = Integer.parseInt(keyId);
-//            for (KeyWord word : textService.getKeyWords()) {
-//                if (word.getId() == id) {
-//                    model.addAttribute("id", id);
-//                    model.addAttribute("word", word.getName());
-//
-//                    model.addAttribute("meanWords", textService.getMeanWords());
-//                    model.addAttribute("meanCount", textService.getMeanWords().size());
-//
-//                    model.addAttribute("keyMeanWords", word.getMeanWords());
-//                    model.addAttribute("keyMeanCount", word.getMeanWords().size());
-//
-//                    List<SenseBlock> senseBlocks = textService.getSenseBlocks();
-//                    model.addAttribute("senseBlocks", senseBlocks);
-//                    model.addAttribute("senseCount", senseBlocks.size());
-//
-//                    return "content-key-view";
-//                }
-//            }
-//            LOGGER.error("KeyWord not found.");
-//            return "content-key-list";
-//        } catch (Exception ex) {
-//            LOGGER.error("Server error.", ex);
-//            return "not-authorized";
-//        }
-//    }
-
-    /**
-     * Handles and retrieves the AJAX request for adding new key word.
-     *
-     * @return {@code String}, that represents text response of operation status.
-     */
-//    @RequestMapping(value = "/key/view", method = RequestMethod.POST,
-//            produces = "application/json; charset=utf-8")
-//    public
-//    @ResponseBody
-//    String contentKeyMeanUpdate(@RequestParam(value = "keyId", required = true) String keyId,
-//                                @RequestParam(value = "meanId", required = true) String meanId) {
-//        try {
-//            if (!userSession.isLogged())
-//                return "{\"code\":2,\"msg\":\"Access denied.\",\"data\":\"You have no rights to do this.\"}";
-//
-//            JsonData json;
-//            int keyIdVal = Integer.parseInt(keyId);
-//            int meanIdVal = Integer.parseInt(meanId);
-//
-//            for (KeyWord key : textService.getKeyWords()) {
-//                if (key.getId() == keyIdVal) {
-//                    for (int i = 0; i < key.getMeanWords().size(); i++) {
-//                        if (key.getMeanWords().get(i).getId() == meanIdVal) {
-//                            key.getMeanWords().remove(i);
-//                            json = new JsonData(3, "Category inactivated.", "inactivated");
-//                            return json.toString();
-//                        }
-//                    }
-//                    key.getMeanWords().add(textService.getMeanWords().get(meanIdVal));
-//                    json = new JsonData(3, "Category activated.", "activated");
-//                    return json.toString();
-//                }
-//            }
-//
-//            //json = new JsonData(0, "Category added.", status);
-//            json = new JsonData(4, "Category not found.", ErrorCode.CODE_4);
-//
-//            return json.toString();
-//        } catch (Exception ex) {
-//            LOGGER.info(ex.getMessage());
-//            return "{\"code\":1,\"msg\":\"Server error.\",\"data\":\"See server log.\"}";
-//        }
-//    }
-
-//    private String navaigateToProjects(Model model) {
-//        List<Project> projects;
-//        int count;
-//
-//        projects = projectService.getAll(new Project(userSession.getUser()));
-//        count = projects.size();
-//        model.addAttribute("projects", projects);
-//        model.addAttribute("count", count);
-//
-//        return "project-list";
-//    }
 }

@@ -52,7 +52,7 @@ function login() {
 
 /** Detect Enter pressing to submit data to server without form. */
 $(document).keypress(function (key) {
-    if (key.keyCode == 13 && $(document.activeElement).is('#login-form')) {
+    if (key.keyCode == 13 && $(document.activeElement).is('input')) {
         login();
     }
 });

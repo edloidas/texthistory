@@ -333,6 +333,10 @@ aside a:hover {
     padding: 10px;
 }
 
+#holder {
+    height: auto;
+}
+
 #loading {
     margin-top: 100px;
     padding-top: 105px;
@@ -656,4 +660,20 @@ progress {
 
 .fright {
     float: right;
+}
+
+.aleft {
+    text-align: left;
+}
+
+.acenter {
+    text-align: center;
+}
+
+.aright {
+    text-align: right;
+}
+
+br.clearboth {
+    clear: both;
 }

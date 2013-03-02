@@ -21,8 +21,8 @@
         <td><c:out value="${textWordsLength}"/></td>
     </tr>
     <tr>
-        <td>Число значимых слов</td>
-        <td><c:out value="${textMeanCount}"/></td>
+        <td>Число ключевых слов</td>
+        <td><c:out value="${textKeyCount}"/></td>
     </tr>
     <tr>
         <td>Вода</td>

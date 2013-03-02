@@ -116,7 +116,7 @@ function generateAside(items) {
 }
 
 function dataShowLoading() {
-    $(data).html('');
+    $('#data').html('');
     $('<div/>', {
         id: 'loading',
         text: 'Loading, please wait...'
@@ -136,17 +136,12 @@ function changePage(position, asideItems, data) {
     $('#content').html(data);
 }
 
-function changePage(position, data) {
-    $('#position').text(position);
-    $('#content').html(data);
-}
-
 //------------------------------------------------------------------------
 // LOCAL STORAGE AND SESSION
 //------------------------------------------------------------------------
 var storage = new function () {
     // TODO: Add localStorage support and save state and session.
-}
+};
 //------------------------------------------------------------------------
 // AJAX EVENTS HANDLERS
 //------------------------------------------------------------------------
@@ -184,21 +179,6 @@ var handler = new function () {
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
             dataType: 'html'
         }).done(function (data) {
-                changePage('Главная', data);
-            }).fail(function () {
-                notify('error', 'Unable to reach the server.');
-            });
-    }
-
-    /** Retrieves home-page data */
-    this.homeData = function homeData() {
-        dataShowLoading();
-        $.ajax({
-            type: 'POST',
-            url: '/texthistory/home/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'html'
-        }).done(function (data) {
                 changePage('Главная',
                     [
                         {id: 'do-home-sort-data', text: 'Сортировать по дате'},
@@ -217,20 +197,6 @@ var handler = new function () {
         dataShowLoading();
         $.ajax({
             type: 'GET',
-            url: '/texthistory/project/list/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'html'
-        }).done(function (data) {
-                changePage('Список проектов', data);
-            }).fail(function () {
-                notify('error', 'Unable to reach the server.');
-            });
-    }
-    /** List of projects (DATA) */
-    this.projectListData = function projectListData() {
-        dataShowLoading();
-        $.ajax({
-            type: 'POST',
             url: '/texthistory/project/list/',
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
             dataType: 'html'
@@ -315,20 +281,6 @@ var handler = new function () {
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
             dataType: 'html'
         }).done(function (data) {
-                changePage('Новый проект', data);
-            }).fail(function () {
-                notify('error', 'Unable to reach the server.');
-            });
-    }
-    /** Retrieves new project creation page data*/
-    this.projectNewData = function projectNewData() {
-        dataShowLoading();
-        $.ajax({
-            type: 'POST',
-            url: '/texthistory/project/new/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'html'
-        }).done(function (data) {
                 changePage('Новый проект',
                     [
                         {id: 'do-proj-new-clear', text: 'Очистить данные'},
@@ -384,25 +336,6 @@ var handler = new function () {
             dataShowLoading();
             $.ajax({
                 type: 'GET',
-                url: '/texthistory/project/view/' + id + '/',
-                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                dataType: 'html'
-            }).done(function (data) {
-                    changePage('Просмотр проекта', data);
-                }).fail(function () {
-                    notify('error', 'Unable to reach the server.');
-                });
-        }
-    }
-    /** Open project for view (DATA) */
-    this.projectViewData = function projectViewData() {
-        var id = $($('input[name=id]:checked').get(0)).val();
-        if (id == null) {
-            notify('warning', 'Проект не выбран.');
-        } else {
-            dataShowLoading();
-            $.ajax({
-                type: 'POST',
                 url: '/texthistory/project/view/' + id + '/',
                 contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                 dataType: 'html'
@@ -493,11 +426,8 @@ var handler = new function () {
                     }
                     return myXhr;
                 },
-                // Form data
                 data: formData,
-                // To be able to retrieve json response
                 dataType: 'json',
-                // Options to tell JQuery not to process data or worry about content-type
                 cache: false,
                 contentType: false,
                 processData: false
@@ -584,20 +514,6 @@ var handler = new function () {
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
             dataType: 'html'
         }).done(function (data) {
-                changePage('Статистика данных', data);
-            }).fail(function () {
-                notify('error', 'Unable to reach the server.');
-            });
-    }
-    /** Content analysis statistics (DATA)*/
-    this.caStatisticsData = function caStatisticsData() {
-        dataShowLoading();
-        $.ajax({
-            type: 'POST',
-            url: '/texthistory/content/statistic/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'html'
-        }).done(function (data) {
                 changePage('Статистика данных',
                     [
                         {id: 'sep', text: ''}
@@ -613,20 +529,6 @@ var handler = new function () {
         dataShowLoading();
         $.ajax({
             type: 'GET',
-            url: '/texthistory/content/graph/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'html'
-        }).done(function (data) {
-                changePage('Графики распределенности', data);
-            }).fail(function () {
-                notify('error', 'Unable to reach the server.');
-            });
-    }
-    /** Content analysis graphics (DATA)*/
-    this.caGraphicsData = function caGraphicsData() {
-        dataShowLoading();
-        $.ajax({
-            type: 'POST',
             url: '/texthistory/content/graph/',
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
             dataType: 'html'
@@ -651,20 +553,6 @@ var handler = new function () {
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
             dataType: 'html'
         }).done(function (data) {
-                changePage('Ключевые слова/категории', data);
-            }).fail(function () {
-                notify('error', 'Unable to reach the server.');
-            });
-    }
-    /** Content analysis key words list (DATA)*/
-    this.caKeyListData = function caKeyListData() {
-        dataShowLoading();
-        $.ajax({
-            type: 'POST',
-            url: '/texthistory/content/key/list/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'html'
-        }).done(function (data) {
                 changePage('Ключевые слова/категории',
                     [
                         {id: 'do-cont-key-list-view', text: 'Просмотреть'},
@@ -681,7 +569,7 @@ var handler = new function () {
     this.caKeyView = function caKeyView() {
         var id = $($('input[name=id]:checked').get(0)).val();
         if (id == null) {
-            notify('warning', 'Слово/категория не выбрана.');
+            notify('warning', 'Категория не выбрана.');
         } else {
             dataShowLoading();
             $.ajax({
@@ -690,29 +578,10 @@ var handler = new function () {
                 contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                 dataType: 'html'
             }).done(function (data) {
-                    changePage('Просмотр слова/категории', data);
-                }).fail(function () {
-                    notify('error', 'Unable to reach the server.');
-                });
-        }
-    }
-    /** Content analysis key words view (DATA)*/
-    this.caKeyViewData = function caKeyViewData() {
-        var id = $($('input[name=id]:checked').get(0)).val();
-        if (id == null) {
-            notify('warning', 'Слово/категория не выбрана.');
-        } else {
-            dataShowLoading();
-            $.ajax({
-                type: 'POST',
-                url: '/texthistory/content/key/view/' + id + '/',
-                contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-                dataType: 'html'
-            }).done(function (data) {
-                    changePage('Просмотр слова/категории',
+                    changePage('Просмотр категории',
                         [
-                            {id: 'do-proj-view-exclude', text: 'Добавить в категорию'},
-                            {id: 'do-proj-view-status', text: 'Расформировать категорию'},
+                            {id: 'do-cat-view-add', text: 'Добавить в категорию'},
+                            {id: 'do-cat-view-split', text: 'Расформировать категорию'},
                             {id: 'sep', text: ''}
                         ],
                         data);
@@ -721,7 +590,7 @@ var handler = new function () {
                 });
         }
     }
-}
+};
 //------------------------------------------------------------------------
 // AJAX EVENTS
 //------------------------------------------------------------------------
