@@ -23,7 +23,7 @@ function notify(type, text) {
 }
 
 function login() {
-    if ($('#login').val() == '' || $('#password').val() == '') {
+    if ($('#loginField').val() == '' || $('#passwordField').val() == '') {
         if ($('#login').val() == '')
             notify('warning', 'Login should not empty.');
         if ($('#password').val() == '')
@@ -34,8 +34,8 @@ function login() {
             url: '/texthistory/login/',
             contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
             dataType: 'json',
-            data: {"login": $('#login').val(),
-                "password": $('#password').val()}
+            data: {"login": $('#loginField').val(),
+                "password": $('#passwordField').val()}
         }).done(function (data) {
                 if (data.code == 0) {
                     window.location = '/texthistory/home/';
@@ -58,4 +58,16 @@ $(document).keypress(function (key) {
 });
 
 $('#btn-login').click(login);
+
+//------------------------------------------------------------------------
+// Support check
+//------------------------------------------------------------------------
+$(document).ready(function () {
+    $(document).ready(function() {
+        if(typeof(Storage) === "undefined") {
+            $('#support').removeClass('invisible');
+            $('input').each(function(){$(this).prop('disabled', true);});
+        }
+    });
+});
 

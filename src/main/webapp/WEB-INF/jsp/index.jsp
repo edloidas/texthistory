@@ -21,32 +21,41 @@
 </head>
 
 <body>
-<div id="box">
-    <div id="header" class="">Добро пожаловать в <span class="title">Texthistory</span></div>
+    <div id="box">
+        <div id="header" class="">Добро пожаловать в <span class="title">Texthistory</span></div>
+        <table>
+            <tbody>
+            <tr>
+                <td>
+                    <h3>Облачный сервис</h3>
+                    <article>Texthistory является облачным сервисом, предоставляющим инструменты для анализа нарративных источников.</article>
+                    <h3>Три в одном</h3>
+                    <article>Серсис позволяет использовать интеграрованные инструменты для контент-, дискурс- и психо-анализа. Загружайте источники, создавайте проекты и сохраняйте результаты проведенного анализа.</article>
+                    <br/><a id="demo">Узнать больше...</a>
+                </td>
+                <td class="right">
+                    <h2>Авторизация</h2>
+                    <label for="loginField">Логин</label>
+                    <input type="textfield" id="loginField" class="field"/>
 
-    <div id="login-form" class="column right">
-        <h2>Авторизация</h2>
-        <label for="login">Логин</label>
-        <input type="textfield" id="login" class="field"/>
+                    <label for="passwordField">Пароль</label>
+                    <input type="password" id="passwordField" class="field"/>
 
-        <label for="password">Пароль</label>
-        <input type="password" id="password" class="field"/>
+                    <input type="button" id="btn-login" class="btn apply" value="Войти"/>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
-        <input type="button" id="btn-login" class="btn apply" value="Войти"/>
+        <div id="support" class="invisible">Ваш браузер не поддерживает некоторые возможности, необходимые для работы с сервисом. Обновите существующий браузер или загрузите один из предложенных ниже.
+            <ul id="browsers">
+                <li><a class="logo" href="http://www.google.com/chrome/" title="Chrome"><img src="<c:url value="/resources/img/icons/chrome.png" />" alt="Chrome"/></a></li>
+                <li><a class="logo" href="http://www.mozilla.org/firefox/new/" title="Firefox"><img src="<c:url value="/resources/img/icons/firefox.png" />" alt="Firefox"/></a></li>
+                <li><a class="logo" href="http://www.opera.com/computer/" title="Opera"><img src="<c:url value="/resources/img/icons/opera.png" />" alt="Opera"/></a></li>
+            </ul>
+        </div>
     </div>
-    <div class="column">
-        <h3>Облачный сервис</h3>
-        <article>Texthistory является облачным сервисом, предоставляющим инструменты для анализа нарративных
-            источников.
-        </article>
-        <h3>Три в одном</h3>
-        <article>Серсис позволяет использовать интеграрованные инструменты для контент-, дискурс- и психо-анализа.
-            Загружайте источники, создавайте проекты и сохраняйте результаты проведенного анализа.
-        </article>
-        <a id="demo">Узнать больше...</a>
-    </div>
-</div>
-<footer>© 2012 Texthistory by Edloidas. edloidas@gmail.com | priborovich@gmail.com</footer>
-<script src="<c:url value="/resources/js/login.js" />"></script>
+    <footer>© 2012 Texthistory by Edloidas. edloidas@gmail.com | priborovich@gmail.com</footer>
+    <script src="<c:url value="/resources/js/login.js" />"></script>
 </body>
 </html>

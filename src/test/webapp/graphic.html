@@ -1,0 +1,361 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>
+            Texthistory
+        </title>
+        <link rel="shortcut icon" href="./img/favicon.png" type="image/png">
+		<link rel="stylesheet" href="./css/normalize.css" type="text/css">
+		<link rel="stylesheet" href="./css/style.css" type="text/css">
+		<link rel="stylesheet" href="./css/tipTip.css" type="text/css">
+		<script src="./js/jquery-1.9.0.min.js"></script>
+		<!-- TipTip -->
+		<script src="./js/jquery.tipTip.js"></script>
+		<!-- Noty -->
+		<script src="./js/noty/jquery.noty.js"></script>
+		<script src="./js/noty/layouts/bottomRight.js"></script>
+		<script src="./js/noty/themes/default.js"></script>
+        <!-- Raphael -->
+        <script src="./js/raphael/raphael-min.js"></script>
+        <script src="./js/raphael/g.raphael-min.js"></script>
+        <script src="./js/raphael/g.bar-min.js"></script>
+        <!-- D3 -->
+        <script src="./js/d3/d3.v3.js"></script>
+        <script src="./js/d3/d3.layout.cloud.js"></script>
+    </head>
+
+    <body>
+		<nav>
+		   <ul>
+				<li><a id="nav-hm" class="white">Главная</a></li>
+				<li><a id="nav-pm" class="dir green">Проект</a></li>
+				<li><a id="nav-ca" class="dir orange">Контент-анализ</a></li>
+				<li><a id="nav-da" class="dir blue">Дискурс-анализ</a></li>
+				<li><a id="nav-pa" class="dir red">Психоанализ</a></li>
+			</ul>
+			<a id="account"><div class="caret"></div>edloidas@gmail.com</a>
+			<br/>
+			<ul class="subdir nav-pm hidden">
+				<!-- SUBDIR : PROJECT -->
+				<li><a id="nav-pm-n" class="green tip" title="Новый проект">Новый проект</a></li>
+				<li><a id="nav-pm-l" class="blue tip" title="Список проектов">Список проектов</a></li>
+			</ul>
+			<ul class="subdir nav-ca hidden">
+				<!-- SUBDIR : CONTENT -->
+				<li><a id="nav-ca-s" class="orange tip" title="Статистика">Статистика</a></li>
+				<li><a id="nav-ca-g" class="blue tip" title="Графики распределения">Графики</a></li>
+				<li><a id="nav-ca-t" class="red tip" title="Прочие инструменты">Инструменты</a></li>
+				<li><a id="nav-ca-d" class="green tip" title="Создание словаря">Словарь</a></li>
+			</ul>
+			<ul class="subdir nav-da hidden">
+				<!-- SUBDIR : DISCOURSE -->
+				<li><a id="nav-da-c" class="blue tip" title="Конкорданс">Конкорданс</a></li>
+				<li><a id="nav-da-t" class="red tip" title="Прочие инструменты">Инструменты</a></li>
+			</ul>
+			<ul class="subdir nav-pa hidden">
+				<!-- SUBDIR : PSYCHO -->
+				<li><a id="nav-pa-c" class="red tip" title="Конкорданс">Конкорданс</a></li>
+				<li><a id="nav-pa-t" class="green tip" title="Прочие инструменты">Инструменты</a></li>
+			</ul>
+			<br id="newline"/>
+        </nav>
+		<div id="toolset">
+			<div id="position">Новый проект</div>
+			<div id="wrapper">
+				<a id="do-sync" class="ctrl tip" title="Синхронизация с сервером"><span class="i-sinc"></span></a>
+				<a id="do-resize" class="ctrl tip" title="Показать/скрыть боковую панель"><span class="i-resize"></span></a>
+			</div>
+		</div>
+		<aside>
+			<a>Частота</a>
+            <a>Корреляция</a>
+			<a>Облако тегов</a>
+			<a>Круг тегов</a>
+			<div class="sep"></div>
+		</aside>
+		<div id="content" class="resized">
+				<!--<div id="toolset"></div>-->
+			<div id="data">
+				<h3>Graphics</h3>
+				<div id="holder"></div>	
+            </div>
+        </div>
+		<div id="userinfo" class="hidden">
+			<table>
+				<tbody>
+				<tr><td class="info-title">Проект:</td></tr>
+				<tr><td class="info-data" id="cur-project"><!--<c:out value="${sessionProject}"/>--></td></tr>
+				</tbody>
+			</table>
+			<div class="sep"></div>
+			<table>
+				<thead>
+				<tr><td class="info-title">Авторы</td></tr>
+				</thead>
+				<tbody>
+				<tr>
+					<td>Толкачев</td>
+					<td class="info-name">email:</td>
+					<td class="info-data"><a href="mailto:edloidas@gmail.com">edloidas@gmail.com</a></td>
+				</tr>
+				<tr>
+					<td class="info-title"></td>
+					<td class="info-name">twitter:</td>
+					<td class="info-data"><a href="https://twitter.com/edloidas">edloidas</a></td>
+				</tr>
+				<tr>
+					<td>Приборович</td>
+					<td class="info-name">email:</td>
+					<td class="info-data"><a href="mailto:priborovich@gmail.com">priborovich@gmail.com</a></td>
+				</tr>
+				</tbody>
+			</table>
+			<div class="sep"></div>
+			<a id="logout">Выйти</a> || <a id="nav-settings">Настройки</a>
+		</div>
+		
+		<script src="./js/engine.js"></script>
+        
+        <script>
+        /*
+        CATEGORY
+        this.id = 0;
+        this.name = word.getName();
+        this.rank = 0;
+        this.average = 0.0d;
+        this.count = word.getCount();
+        this.frequency = 0.0d;
+        // intervals should be generated on update
+        this.keyWords = new ArrayList<>();
+        
+        KEY
+        this.id = id;
+        this.name = name;
+        this.rank = 0;
+        this.count = 0; // o is default. count will be updated after concordance added.
+        this.intervals = new ArrayList<>();
+        this.concordances = new ArrayList<>();
+        this.scores = new ArrayList<>();
+        
+        SCORE
+        this.word = word;
+        this.count = 1;
+        this.score = 0;
+        
+        */
+var words = {
+    category:
+        [
+            {
+                id: 1,
+                name: "One",
+                rank: 1,
+                count: 0,
+                average: 0,
+                freq: 0
+            },
+            {
+                id: 2,
+                name: "Two",
+                rank: 2,
+                count: 0,
+                average: 0,
+                freq: 0
+            }
+        ],
+    key:
+        [
+            {
+                id: 1,
+                name: "One",
+                rank: 1,
+                count: 1,
+                link: 1,
+                interval: [1, 0, 1, 1, 0, 0, 0, 1, 2, 0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 1],
+                concord: [{before: "before 1 ", after: " after 2"},
+                          {before: "before 2 ", after: " after 2"}],
+                score: []
+            },
+            {
+                id: 2,
+                name: "Two",
+                rank: 2,
+                count: 1,
+                link: 2,
+                interval: [1, 0, 1, 1, 0, 2, 0, 2, 2, 0, 0, 0, 1, 0, 0, 0, 0, 1, 2, 0],
+                concord: [{before: "before ", after: " after"}],
+                score: [{word: "ScoreWord", count: 2, score: 1.78}]
+            }
+        ],
+    table :
+        [
+            {col: "#", width: 40},
+            {col: "R", width: 40},
+            {col: "Категория", width: 0},
+            {col: "Тип", width: 120},
+            {col: "Вхождений", width: 100},
+            {col: "Вес", width: 60},
+            {col: "Частота", width: 60}
+        ],
+    locale:
+        {
+            word: 'слово',
+            category: 'категория'
+        },
+    text: ""
+};
+
+function createTable(data, holder) {
+    "use strict";
+    try {
+        var table = $('<table/>', {id: 'wordsTable', 'class': 'list', width: '100%'}),
+            colgroup = $('<colgroup/>', {span: data.table.length}),
+            thead = $('<thead/>'),
+            tbody = $('<tbody/>'),
+            tr = $('<tr/>', {'class': 'first'}),
+            td;
+
+        $(data.table).each(function (index, col) {
+            $(colgroup).append($('<col/>', {span: 1, width: col.width}));
+            $(tr).append($('<td/>', {text: col.col}));
+        });
+        $(thead).append(tr);
+
+        $(data.category).each(function (index, c) {
+            $(tbody).append('<tr class="cat">'
+                           + '<td>' + c.id + '<\/td>'
+                           + '<td>' + c.rank + '<\/td>'
+                           + '<td>' + c.name + '<\/td>'
+                           + '<td>' + data.locale.category + '<\/td>'
+                           + '<td>' + c.count + '<\/td>'
+                           + '<td>' + c.average + '<\/td>'
+                           + '<td>' + c.freq + '<\/td>'
+                           + '<\/tr>');
+            $(data.key).each(function (i, k) {
+                if (k.link === c.id) {
+                    $(tbody).append('<tr class="key data-link-id-' + k.link + ' hidden>'
+                           + '<td>' + k.id + '<\/td>'
+                           + '<td>' + k.rank + '<\/td>'
+                           + '<td>' + k.name + '<\/td>'
+                           + '<td>' + data.locale.word + '<\/td>'
+                           + '<td>' + k.count + '<\/td>'
+                           + '<td>-<\/td>'
+                           + '<td>-<\/td>'
+                           + '<\/tr>');
+                }
+            });
+        });
+        $(table).append(colgroup).append(thead).append(tbody);
+        $("#" + holder).html(table);
+    } catch (e) {
+        console.warn(e);
+    }
+}
+
+// Returns a flattened hierarchy containing all leaf nodes under the root.
+function toFlatArray(root) {
+    "use strict";
+    var nodes = [],
+        name;
+    $(root.key).each(function (index, key) {
+        var nodeName = "",
+            i;
+        for (i = 0; i < root.category.length; i++) {
+            if (root.category[i].id === key.link) {
+                name = root.category[i].name;
+                break;
+            }
+        }
+        nodes.push({packageName: name, className: key.name, value: key.count});
+    });
+    return nodes;
+}
+
+function treeToFlatArray(root) {
+    "use strict";
+    var nodes = [];
+    function recurse(name, node) {
+        if (node.children) {
+            node.children.forEach(function (child) { recurse(node.name, child); });
+        } else {
+            nodes.push({packageName: name, className: node.name, value: node.count});
+        }
+    }
+    root.words.forEach(function (node) {recurse(null, node); });
+    return nodes;
+}
+
+// holder - is an ID name
+function drawBarChart(data, holder, size) {
+    "use strict";
+    var r = new Raphael(holder, size, (data.key.length * 40)),
+        txtattr = { font: "12px sans-serif", anchor: "left" },
+        typeattr = {type: "sharp", fill: "#2f69bf"},
+        i;
+    for (i = 0; i < data.key.length; i++) {
+        r.text(100, (15 + i * 40), data.key[i].name).attr(txtattr);
+        r.barchart(200, (-10 + i * 40), 400, 50, data.key[i].interval, 0).attr(typeattr);
+    }
+}
+
+// holder - is an ID name
+function drawCircleChart(data, holder, diameter) {
+    "use strict";
+    function classes(root) {
+        return {children: toFlatArray(root)};
+    }
+    var format = d3.format(",d"),
+        color = d3.scale.category20c(),
+        bubble = d3.layout.pack().sort(null).size([diameter, diameter]).padding(1.5),
+        svg = d3.select("#" + holder).append("svg").attr("width", diameter).attr("height", diameter).attr("class", "bubble"),
+        node = svg.selectAll(".node")
+            .data(bubble.nodes(classes(data))
+                .filter(function (d) { return !d.children; }))
+            .enter().append("g")
+            .attr("class", "node")
+            .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+    node.append("title").text(function (d) { return d.className + " [" + d.packageName + "]: " + format(d.value); });
+    node.append("circle").attr("r", function (d) { return d.r; }).style("fill", function (d) { return color(d.packageName); });
+    node.append("text").attr("dy", ".2em").style("text-anchor", "middle").text(function (d) { return d.className.substring(0, d.r / 4); });
+    d3.select(self.frameElement).style("height", diameter + "px");
+
+
+}
+
+function drawCloudChart(data, holder, size) {
+    "use strict";
+    var fill = d3.scale.category20();
+    function draw(elem) {
+        d3.select("#" + holder).append("svg")
+                .attr("width", size)
+                .attr("height", size)
+                .append("g")
+                .attr("transform", "translate(" + size / 2 + "," + size / 2 + ")")
+                .selectAll("text")
+                .data(elem)
+                .enter().append("text")
+                .style("font-size", function (d) { return d.size + "px"; })
+                .style("font-family", "Impact")
+                .style("fill", function (d, i) { return fill(i); })
+                .attr("text-anchor", "middle")
+                .attr("transform", function (d) {return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
+                .text(function (d) { return d.text; });
+    }
+
+    d3.layout.cloud().size([size, size])
+        .words(toFlatArray(data).map(function (d) {
+            return {text: d.className, size: d.value * 12}; // Set font size here only
+        }))
+        .rotate(function () { return ~~(Math.random() * 2) * 90; })
+        .font("Impact")
+        .fontSize(function (d) { return d.size; })
+        .on("end", draw)
+        .start();
+
+}
+</script>
+
+    </body>
+</html>

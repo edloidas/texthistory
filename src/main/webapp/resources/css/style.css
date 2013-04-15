@@ -340,7 +340,7 @@ aside a:hover {
 #loading {
     margin-top: 100px;
     padding-top: 105px;
-    background: white url('../img/icons/loading.gif') center no-repeat;
+    background: white url('../img/load.gif') center no-repeat;
     text-align: center;
     font-weight: bold;
     cursor: default;
@@ -410,14 +410,6 @@ aside a:hover {
 
 .ctrl span.i-sinc {
     background-image: url(../img/icons/sinc.png);
-}
-
-.ctrl span.i-undo {
-    background-image: url(../img/icons/undo.png);
-}
-
-.ctrl span.i-redo {
-    background-image: url(../img/icons/redo.png);
 }
 
 .btn {
@@ -543,11 +535,6 @@ aside a:hover {
     background: #f3f3f3;
 }
 
-/*
-.list tbody tr:active {
-	color: deepSkyBlue;
-}
-*/
 .list tbody tr td {
     padding: 5px 10px 5px 8px;
     white-space: nowrap;
@@ -592,15 +579,6 @@ aside a:hover {
 
 /* Inputs
 ------------------------------*/
-#load {
-    background: url(../img/load.gif) top no-repeat;
-    margin-top: 100px;
-    padding-top: 72px;
-    text-align: center;
-    font-size: 8pt;
-    cursor: default;
-}
-
 .field {
     padding: 5px;
     margin: 5px;
@@ -646,6 +624,30 @@ progress {
     width: 400px;
     height: 20px;
     margin: 5px 0px;
+}
+
+/* Checkbox and Radio styling for Chrome, Safari and WebKit only.
+ * IE will modify elements due to background-image */
+input[type="checkbox"], input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin: 0px;
+    position: relative;
+    background: url(../img/icons/unchecked_checkbox.png) center no-repeat;
+    background-size: 14px 14px;
+    display: inline-block;
+    cursor:pointer;
+    -webkit-appearance: none;
+}
+
+input[type="checkbox"]:checked {
+    background: url(../img/icons/checked_checkbox.png) center no-repeat;
+    background-size: 14px 14px;
+}
+
+input[type="radio"]:checked {
+    background: url(../img/icons/checked_radio.png) center no-repeat;
+    background-size: 14px 14px;
 }
 
 /* Modifiers

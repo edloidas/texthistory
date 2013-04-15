@@ -3,6 +3,7 @@ package org.edloidas.web.controller;
 import org.apache.log4j.Logger;
 import org.edloidas.entity.common.Project;
 import org.edloidas.entity.common.Source;
+import org.edloidas.web.exception.NotAuthorizedException;
 import org.edloidas.web.json.JsonData;
 import org.edloidas.web.service.EntityService;
 import org.edloidas.web.service.SessionService;
@@ -77,7 +78,7 @@ public class ProjectController {
     public String projectList(Model model) {
         try {
             if (!userSession.isLogged()) {
-                return "index";
+                throw new NotAuthorizedException("Access denied. User not authorized.");
             }
 
             List<Project> projects;
@@ -92,9 +93,11 @@ public class ProjectController {
             model.addAttribute("sessionProject", userSession.getProject().getName());
 
             return "project-list";
+        } catch (NotAuthorizedException ex) {
+            LOGGER.warn(ex.getMessage());
+            return "index";
         } catch (Exception ex) {
-            LOGGER.info(ex.getMessage());
-            /* TODO: Replace with error pages */
+            LOGGER.error("Server error.", ex);
             return "home";
         }
     }
@@ -109,16 +112,18 @@ public class ProjectController {
     public String projectNew(Model model) {
         try {
             if (!userSession.isLogged()) {
-                return "index";
+                throw new NotAuthorizedException("Access denied. User not authorized.");
             }
 
             model.addAttribute("sessionUser", userSession.getUser().getName());
             model.addAttribute("sessionProject", userSession.getProject().getName());
 
             return "project-add";
+        } catch (NotAuthorizedException ex) {
+            LOGGER.warn(ex.getMessage());
+            return "index";
         } catch (Exception ex) {
-            LOGGER.info(ex.getMessage());
-            /* TODO: Replace with error pages */
+            LOGGER.error("Server error.", ex);
             return "home";
         }
     }
@@ -243,7 +248,7 @@ public class ProjectController {
                               Model model) {
         try {
             if (!userSession.isLogged()) {
-                return "index";
+                throw new NotAuthorizedException("Access denied. User not authorized.");
             }
 
             Project project;
@@ -268,10 +273,14 @@ public class ProjectController {
             model.addAttribute("sessionProject", userSession.getProject().getName());
 
             return "project-view";
+        } catch (NotAuthorizedException ex) {
+            LOGGER.warn(ex.getMessage());
+            return "not-authorized";
+        } catch (IndexOutOfBoundsException ex) {
+            return "no-index";
         } catch (Exception ex) {
-            LOGGER.info(ex.getMessage());
-            /* TODO: Replace with error pages */
-            return "project-list";
+            LOGGER.error("Server error.", ex);
+            return "server-error";
         }
     }
 

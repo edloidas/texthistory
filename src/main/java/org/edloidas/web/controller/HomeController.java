@@ -2,6 +2,7 @@ package org.edloidas.web.controller;
 
 import org.apache.log4j.Logger;
 import org.edloidas.entity.common.User;
+import org.edloidas.web.exception.NotAuthorizedException;
 import org.edloidas.web.json.JsonData;
 import org.edloidas.web.service.EntityService;
 import org.edloidas.web.service.SessionService;
@@ -96,12 +97,16 @@ public class HomeController {
     @RequestMapping(value = "/home", method = RequestMethod.GET)
     String base(Model model) {
         try {
-            if (!userSession.isLogged())
-                throw new Exception("Access denied. User not authorized.");
+            if (!userSession.isLogged()) {
+                throw new NotAuthorizedException("Access denied. User not authorized.");
+            }
 
             model.addAttribute("sessionUser", userSession.getUser().getName());
             model.addAttribute("sessionProject", userSession.getProject().getName());
             return "home";
+        } catch (NotAuthorizedException ex) {
+            LOGGER.warn(ex.getMessage());
+            return "index";
         } catch (Exception ex) {
             LOGGER.error("Server error.", ex);
             return "index";

@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.edloidas.entity.common.Project;
 import org.edloidas.entity.common.Source;
 import org.edloidas.text.words.content.Concordance;
+import org.edloidas.web.exception.NotAuthorizedException;
 import org.edloidas.web.service.EntityService;
 import org.edloidas.web.service.SessionService;
 import org.edloidas.web.service.TextService;
@@ -82,7 +83,7 @@ public class ContentController {
     String content(Model model) {
         try {
             if (!userSession.isLogged()) {
-                throw new Exception("Access denied. User not authorized.");
+                throw new NotAuthorizedException("Access denied. User not authorized.");
             }
 
             if (userSession.getProject().getId() == -1) {
@@ -110,9 +111,12 @@ public class ContentController {
             model.addAttribute("textWater", water);
 
             return "content-statistic";
+        } catch (NotAuthorizedException ex) {
+            LOGGER.warn(ex.getMessage());
+            return "not-authorized";
         } catch (Exception ex) {
             LOGGER.error("Server error.", ex);
-            return "not-authorized";
+            return "server-error";
         }
     }
 
@@ -125,7 +129,7 @@ public class ContentController {
     String contentKeyList(Model model) {
         try {
             if (!userSession.isLogged()) {
-                throw new Exception("Access denied. User not authorized.");
+                throw new NotAuthorizedException("Access denied. User not authorized.");
             }
 
             if (userSession.getProject().getId() == -1) {
@@ -150,9 +154,12 @@ public class ContentController {
             model.addAttribute("count", textService.getCategories().size());
 
             return "content-key-list";
+        } catch (NotAuthorizedException ex) {
+            LOGGER.warn(ex.getMessage());
+            return "not-authorized";
         } catch (Exception ex) {
             LOGGER.error("Server error.", ex);
-            return "not-authorized";
+            return "server-error";
         }
     }
 
@@ -169,7 +176,7 @@ public class ContentController {
                                         Model model) {
         try {
             if (!userSession.isLogged()) {
-                throw new Exception("Access denied. User not authorized.");
+                throw new NotAuthorizedException("Access denied. User not authorized.");
             }
 
             if (userSession.getProject().getId() == -1) {
@@ -196,11 +203,14 @@ public class ContentController {
             model.addAttribute("keys", textService.getCategories().get(id).getKeyWords());
 
             return "content-key-view";
+        } catch (NotAuthorizedException ex) {
+            LOGGER.warn(ex.getMessage());
+            return "not-authorized";
         } catch (IndexOutOfBoundsException ex) {
             return "no-index";
         } catch (Exception ex) {
             LOGGER.error("Server error.", ex);
-            return "not-authorized";
+            return "server-error";
         }
     }
 
@@ -213,7 +223,7 @@ public class ContentController {
     String contentMeaningfulGraph(Model model) {
         try {
             if (!userSession.isLogged()) {
-                throw new Exception("Access denied. User not authorized.");
+                throw new NotAuthorizedException("Access denied. User not authorized.");
             }
 
             if (userSession.getProject().getId() == -1) {
@@ -239,9 +249,12 @@ public class ContentController {
             model.addAttribute("count", textService.getCategories().size());
 
             return "content-graph";
+        } catch (NotAuthorizedException ex) {
+            LOGGER.warn(ex.getMessage());
+            return "not-authorized";
         } catch (Exception ex) {
             LOGGER.error("Server error.", ex);
-            return "not-authorized";
+            return "server-error";
         }
     }
 }

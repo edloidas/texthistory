@@ -33,6 +33,11 @@
                 template="/WEB-INF/jsp/system/no-index.jsp">
     </definition>
 
+    <definition name="server-error"
+                template="/WEB-INF/jsp/system/server-error.jsp">
+    </definition>
+
+
     <!-- INDEX : LOGGING PAGE -->
     <definition name="index"
                 template="/WEB-INF/jsp/index.jsp">

@@ -33,24 +33,9 @@ function notify(type, text) {
     });
 }
 
-// --- Toolset ---
-$('#do-resize').click(function () {
-    if ($('#content').hasClass('resized')) {
-        $('aside').hide();
-        $('#content').removeClass('resized');
-    } else {
-        $('aside').show();
-        $('#content').addClass('resized');
-    }
-});
-
 // --- User Inforamtion ---
 $('#account').click(function () {
-    if ($('#userinfo').hasClass('hidden')) {
-        $('#userinfo').removeClass('hidden');
-    } else {
-        $('#userinfo').addClass('hidden');
-    }
+    $('#userinfo').toggleClass('hidden');
 });
 
 // --- Navigation ---
@@ -66,7 +51,6 @@ $('#nav-hm').mouseenter(function () {
     hideSubMenu();
 });
 
-
 function showSubMenu(elem) {
     $('.dir').removeClass('active');
     $('.subdir').addClass('hidden');
@@ -81,17 +65,10 @@ function hideSubMenu() {
 }
 
 // --- Tables Selection ---
-$(document).on('click', 'tr', function () {
-    var checkbox = $($(this).children().get(0)).children().get(0);
-    if ($(checkbox).prop("checked") == false) {
-        $('input[name=id]:checked').each(function () {
-            $(this).prop("checked", false)
-        });
-        $(checkbox).prop("checked", true)
-    } else {
-        $('input[name=id]:checked').each(function () {
-            $(this).prop("checked", false)
-        });
+$(document).on('click', 'tr', function (event) {
+    if (event.target.type !== 'checkbox' && event.target.type !== 'radio') {
+        $(':checkbox', this).trigger('click');
+        $(':radio', this).trigger('click');
     }
 });
 

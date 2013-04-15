@@ -1,0 +1,720 @@
+﻿/**
+Name:   style.css
+Author: Edloidas (edloidas@gmail.com)
+*/
+
+/* COMMON
+------------------------------*/
+ol, ul, li {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+}
+
+body {
+    background: white; /* Default bg color */
+    font-size: 9pt; /* Default font size */
+    color: #333333;
+    overflow-y: scroll;
+    overflow-x: auto;
+}
+
+a {
+    margin: 0;
+    padding: 0;
+    vertical-align: baseline;
+    background: transparent;
+    color: cornflowerBlue;
+    text-decoration: none;
+    cursor: pointer;
+
+    -webkit-transition: all 300ms;
+    -moz-transition: all 300ms;
+    -o-transition: all 300ms;
+    transition: all 300ms;
+}
+
+p {
+    margin: 11px 0px 11px 0px;
+}
+
+td {
+    vertical-align: middle;
+}
+
+pre {
+    word-wrap: break-word;
+}
+
+/* SEPARATORS & CARETS
+------------------------------*/
+.divider {
+    background: darkgray;
+    border-bottom: 1px solid gainsboro;
+    clear: both;
+    height: 1px;
+    margin: 10px 0;
+}
+
+.sep, .sep-low, .sep-min, .sep-max {
+    margin: 7px 0px;
+    border-top: 1px solid darkgray;
+}
+
+.sep-low {
+    margin: 2px 0px 8px 0px;
+}
+
+.sep-min {
+    margin: 5px 0px;
+}
+
+.sep-max {
+    margin: 15px 0px;
+}
+
+.sep-dbl {
+    height: 1px;
+    margin: 7px 0px;
+    border-top: 1px solid darkgray;
+    border-bottom: 1px solid darkgray;
+}
+
+.caret {
+    margin-left: 5px;
+    margin-top: 5px;
+    border-top: 6px solid #333333;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    position: static;
+    vertical-align: top;
+    display: inline-block;
+}
+
+/* NAVIGATION
+------------------------------*/
+nav {
+    width: 100%;
+    background: #333;
+    position: fixed;
+    top: 0px;
+    z-index: 3;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+nav br {
+    clear: left; /* nav will have not null height */
+}
+
+nav br#newline {
+    display: none;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0 20px;
+    margin: 0;
+    float: left;
+}
+
+nav ul li {
+    float: left;
+    position: relative; /*--Declare X and Y axis base for sub navigation--*/
+}
+
+nav a {
+    padding: 12px 15px 8px 15px;
+    color: gainsboro;
+    font-weight: bold;
+    display: block;
+    text-decoration: none;
+    float: left;
+    border-bottom: 4px solid #333333;
+}
+
+nav .subdir a {
+    padding: 13px 15px 9px 15px;
+    color: #333333;
+    border-bottom: 4px solid ghostWhite;
+}
+
+nav a.home {
+    width: 120px;
+    text-align: center;
+}
+
+nav a.white:hover {
+    color: ghostWhite;
+    border-bottom: 4px solid ghostWhite;
+}
+
+nav a.blue:hover, nav a.blue.active {
+    color: lightSkyBlue;
+    border-bottom: 4px solid lightSkyBlue;
+}
+
+nav a.green:hover, nav a.green.active {
+    color: turquoise;
+    border-color: turquoise;
+}
+
+nav a.red:hover, nav a.red.active {
+    color: orangeRed;
+    border-color: orangeRed;
+}
+
+nav a.orange:hover, nav a.orange.active {
+    color: lightSalmon;
+    border-color: lightSalmon;
+}
+
+#account {
+    float: right;
+}
+
+#account .caret {
+    border-top: 6px solid deepSkyBlue;
+    margin-right: 5px;
+}
+
+.nav-pm, .nav-ca, .nav-da, .nav-pa {
+    width: 100%;
+    background: ghostWhite;
+}
+
+.nav-pm {
+    padding-left: 85px;
+    border-top: 2px solid turquoise;
+}
+
+.nav-ca {
+    padding-left: 201px;
+    border-top: 2px solid lightSalmon;
+}
+
+.nav-da {
+    padding-left: 337px;
+    border-top: 2px solid lightSkyBlue;
+}
+
+.nav-pa {
+    padding-left: 468px;
+    border-top: 2px solid orangeRed;
+}
+
+/* TOOLS
+------------------------------*/
+#toolset {
+    width: 100%;
+    height: 42px;
+    background: ghostWhite;
+    position: fixed;
+    top: 38px;
+    border-bottom: 1px solid gainsboro;
+    z-index: 2;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#toolset #position {
+    float: left;
+    padding: 11px 20px;
+    font-weight: bold;
+    font-size: 13pt;
+    cursor: default;
+}
+
+#toolset #wrapper {
+    float: right;
+    padding: 0px 10px;
+}
+
+/* USER INFO
+------------------------------*/
+#userinfo {
+    position: fixed;
+    right: 0px;
+    top: 40px;
+    padding: 10px;
+    background: #333333;
+    color: gainsboro;
+    z-index: 5;
+}
+
+#userinfo a {
+    color: deepSkyBlue;
+}
+
+#userinfo table tr td {
+    font-size: 8pt;
+    padding: 1px 4px;
+}
+
+#userinfo  .info-title {
+    font-weight: bold;
+    cursor: default;
+}
+
+#userinfo  .info-data {
+    color: deepSkyBlue;
+}
+
+#userinfo  .info-name {
+    font-weight: bold;
+}
+
+#settings {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+/* ASIDE
+------------------------------*/
+aside {
+    width: 200px;
+    height: 100%;
+    background: #333;
+    top: 80px;
+    position: fixed;
+    padding-top: 10px;
+    z-index: 1;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+aside .sep {
+    margin: 5px 15px;
+    border-bottom: 1px solid #666666;
+}
+
+aside a {
+    padding: 10px 15px;
+    color: gainsboro;
+    text-transform: uppercase;
+    display: block;
+}
+
+aside a:hover {
+    background: #666666;
+    color: #D14836;
+}
+
+/* DATA
+------------------------------*/
+#content {
+    margin-top: 80px;
+}
+
+#content.resized {
+    margin-left: 200px;
+}
+
+#data {
+    padding: 10px;
+}
+
+#holder {
+    height: auto;
+}
+
+#loading {
+    margin-top: 100px;
+    padding-top: 105px;
+    background: white url('../img/icons/loading.gif') center no-repeat;
+    text-align: center;
+    font-weight: bold;
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* ACTIVE ELEMENTS
+------------------------------*/
+.btn, .ctrl {
+    height: 30px;
+    background: whiteSmoke;
+    background: -webkit-linear-gradient(ghostWhite, whiteSmoke);
+    background: -moz-linear-gradient(ghostWhite, whiteSmoke);
+    background: -o-linear-gradient(ghostWhite, whiteSmoke);
+    background: linear-gradient(ghostWhite, whiteSmoke);
+    border: 1px solid gainsboro;
+    border-radius: 2px;
+    display: block;
+    line-height: 30px;
+    margin: 5px;
+    float: left;
+    text-align: center;
+
+    -webkit-transition: all 300ms;
+    -moz-transition: all 300ms;
+    -o-transition: all 300ms;
+    transition: all 300ms;
+}
+
+.btn:active, .ctrl:active {
+    border: 1px solid darkGray;
+    -webkit-box-shadow: inset 0px 0px 3px 2px gainsboro;
+    -moz-box-shadow: inset 0px 0px 3px 2px gainsboro;
+    box-shadow: inset 0px 0px 3px 2px gainsboro;
+    -webkit-transition: all 300ms;
+    -moz-transition: all 300ms;
+    -o-transition: all 300ms;
+    transition: all 300ms;
+}
+
+.ctrl {
+    width: 30px;
+}
+
+.ctrl span {
+    width: 22px;
+    height: 22px;
+    background-position: center;
+    margin: 4px auto;
+    display: block;
+
+    -webkit-background-size: 22px 22px;
+    -moz-background-size: 22px 22px;
+    -o-background-size: 22px 22px;
+    background-size: 22px 22px;
+
+}
+
+.ctrl span.i-resize {
+    background-image: url(../img/icons/resize.png);
+}
+
+.ctrl span.i-sinc {
+    background-image: url(../img/icons/sinc.png);
+}
+
+.ctrl span.i-undo {
+    background-image: url(../img/icons/undo.png);
+}
+
+.ctrl span.i-redo {
+    background-image: url(../img/icons/redo.png);
+}
+
+.btn {
+    width: 140px;
+}
+
+.btn span {
+    display: block;
+    color: #666666;
+    font-weight: bold;
+    padding: 0 20px;
+}
+
+.btn span.apply {
+    color: #4D90FE;
+}
+
+.btn span.cancel {
+    color: #D14836;
+}
+
+.btn:hover span {
+    background: rgba(255, 255, 255, .25);
+}
+
+.btn:hover span.apply {
+    background: rgba(77, 144, 255, .05);
+}
+
+.btn:hover span.cancel {
+    background: rgba(209, 72, 54, .05);
+}
+
+/* Text
+------------------------------*/
+.title {
+    font-size: 12pt;
+}
+
+.big {
+    font-size: 16pt;
+}
+
+.normal {
+    font-size: 9pt;
+    font-weight: normal;
+}
+
+.small {
+    font-size: 8pt;
+}
+
+.rad {
+    font-size: 8pt;
+    font-weight: bold;
+}
+
+.raw {
+    color: cornflowerBlue;
+}
+
+.remark {
+    color: slategray;
+    font-size: 8pt;
+    font-style: italic;
+    font-weight: normal;
+}
+
+.att {
+    color: #FF3333;
+}
+
+.itl {
+    font-style: italic;
+}
+
+.bld {
+    font-weight: bold;
+}
+
+/* TABLES */
+.manager {
+    color: gray;
+    font-size: 9pt;
+    font-weight: bold;
+    margin: 5px 0px 5px 0px;
+}
+
+.manager td {
+    padding: 10px 0px;
+}
+
+.list {
+    font-size: 9pt;
+    margin: 5px 0px 5px 0px;
+    
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.list thead {
+    font-size: 10pt;
+    font-weight: bold;
+    color: #D14836;
+    cursor: default;
+}
+
+.list thead tr {
+    border-bottom: 3px solid lightGrey;
+}
+
+tr.cat {
+    font-weight: bold;
+    font-size: 10pt;
+}
+
+tr.cat.selected {
+    background-color: #f3f3f3;
+    color: #D14836;
+}
+
+tr.key {
+    font-size: 8pt;
+    color: grey;
+}
+
+.list thead tr td {
+    padding: 5px 10px 5px 8px;
+}
+
+.list thead tr td:hover {
+    background: gainsboro;
+}
+
+.list tbody tr {
+    border-bottom: 1px solid gainsboro;
+    cursor: default;
+}
+
+.list tbody tr:hover {
+    background: #f3f3f3;
+}
+
+.list tbody tr td {
+    padding: 5px 10px 5px 8px;
+    white-space: nowrap;
+}
+
+.list .name {
+    max-width: 200px;
+}
+
+.list .desc {
+    max-width: 400px;
+}
+
+.nowrap {
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.message {
+    border-left: 4px solid #D14836;
+    padding: 5px;
+}
+
+.message .title {
+    font-weight: bold;
+}
+
+.message .text {
+    margin: 5px 0px;
+    padding: 7px;
+    border-top: 1px solid gainsboro;
+    border-bottom: 1px solid gainsboro;
+}
+
+.message .meta {
+    font-size: 8pt;
+}
+
+.dia {
+    margin: 10px 0px 30px 0px;
+}
+
+/* Inputs
+------------------------------*/
+#load {
+    background: url(../img/load.gif) top no-repeat;
+    margin-top: 100px;
+    padding-top: 72px;
+    text-align: center;
+    font-size: 8pt;
+    cursor: default;
+}
+
+.field {
+    padding: 5px;
+    margin: 5px;
+    outline: 0;
+    font-weight: bold;
+    font-size: 8pt;
+    /*font-family: Verdana, Arial, Helvetica, sans-serif;*/
+    border: 1px solid #666666;
+}
+
+input.field, textarea.field {
+    min-width: 200px;
+}
+
+input.field:hover, textarea.field:hover {
+    box-shadow: 0px 0px 3px #666666;
+}
+
+input.field:focus, textarea.field:focus {
+    box-shadow: 0px 0px 3px #666666;
+    border: 1px solid deepSkyBlue;
+}
+
+.tf {
+    width: 400px;
+}
+
+.ta {
+    width: 100%;
+}
+
+.ta-div {
+    padding-right: 22px; /* Fix for 100% width of textarea */
+}
+
+.file {
+    margin: 5px 0px;
+    color: gray;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+progress {
+    width: 400px;
+    height: 20px;
+    margin: 5px 0px;
+}
+
+/* Checkbox and Radio styling for Chrome, Safari and WebKit only.
+ * IE will modify elements due to background-image */
+input[type="checkbox"], input[type="radio"] {
+    width: 20px;
+    height: 20px;
+    margin: 0px;
+    position: relative;
+    background: url(../img/icons/unchecked_checkbox.png) center no-repeat;
+    background-size: 14px 14px;
+    display: inline-block;
+    cursor:pointer;
+    -webkit-appearance: none;
+}
+
+input[type="checkbox"]:checked {
+    background: url(../img/icons/checked_checkbox.png) center no-repeat;
+    background-size: 14px 14px;
+}
+
+input[type="radio"]:checked {
+    background: url(../img/icons/checked_radio.png) center no-repeat;
+    background-size: 14px 14px;
+}
+
+/* Modifiers
+------------------------------*/
+.hidden, .invisible {
+    display: none;
+}
+
+.fleft {
+    float: left;
+}
+
+.fright {
+    float: right;
+}
+
+.aleft {
+    text-align: left;
+}
+
+.acenter {
+    text-align: center;
+}
+
+.aright {
+    text-align: right;
+}
+
+br.clearboth {
+    clear: both;
+}

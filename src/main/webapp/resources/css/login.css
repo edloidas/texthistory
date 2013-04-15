@@ -2,7 +2,6 @@ body {
     margin: 0px;
     padding-top: 60px;
     background: whiteSmoke url("../img/bg-light.png");
-    font-family: Verdana, Arial, Helvetica, sans-serif;
     font-size: 9pt;
 }
 
@@ -80,20 +79,19 @@ h3 {
     cursor: default;
 }
 
-.title {
-    color: deepSkyBlue;
+td {
+    padding: 10px;
 }
 
-.column {
+td.right {
     width: 280px;
-    min-height: 235px;
-    padding: 20px 10px;
-}
-
-.column.right {
-    float: right;
+    vertical-align: top;
     outline: 1px solid gainsboro;
     background: whiteSmoke;
+}
+
+.title {
+    color: deepSkyBlue;
 }
 
 label {
@@ -141,18 +139,12 @@ article {
     background: #4D90FE;
 }
 
-.btn.cancel {
-    color: whiteSmoke;
-    background: #D14836;
-}
-
 .field {
     padding: 5px;
     margin: 5px;
     outline: 0;
     font-weight: bold;
     font-size: 12pt;
-    font-family: Verdana, Arial, Helvetica, sans-serif;
     border: 1px solid #666666;
 }
 
@@ -168,4 +160,37 @@ input.field:hover {
 input.field:focus {
     box-shadow: 0px 0px 3px #666666;
     border: 1px solid deepSkyBlue;
+}
+
+input:disabled {
+    background-color: gainsboro;
+}
+
+#support  {
+    color: red;
+    margin-top: 2em;
+}
+
+#support ul {
+    margin: 2em 0 0 0;
+    padding-left: 0;
+    overflow: hidden;
+}
+
+#support li {
+    list-style-type: none;
+    float: left;
+    display: block;
+}
+
+a.logo {
+    padding: 10px;
+}
+a.logo, a.logo img {
+    width: 44px;
+    height: 44px;
+}
+
+.invisible {
+    display: none;
 }
