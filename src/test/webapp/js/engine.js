@@ -1,7 +1,11 @@
 /**
- * Navigation.js
+ * Engine.js
  *
- * based on jQuery API
+ * Requirements:
+ * - jQuery
+ * - Rapahael & gRaphael
+ * - Noty
+ * - D3
  *
  * Set tooltips and div-links for navigation menu.
  * 'window.location.replace(url)' replaces the current location in the address
@@ -22,8 +26,6 @@ $(function initialization() {
     localStorage['hash'] = "";
     //    data -- 
     localStorage['data'] = "";
-    //    sync with server?
-    localStorage['sync'] = "true";
 });
 
 //------------------------------------------------------------------------
@@ -66,6 +68,194 @@ function changePage(position, asideItems, data) {
     generateAside(asideItems);
     $('#content').html(data);
 }
+
+//------------------------------------------------------------------------
+// TOOLSET WITH EXTERNAL FUNCTIONS
+//------------------------------------------------------------------------
+var toolset = new function () {
+    // MD5 IMPLEMENTATION ==============================
+    /**
+     * Implementation of md5 hash function for javascript by Joseph's Myers
+     * See http://www.myersdaily.org/joseph/javascript/md5-text.html
+     */
+    function md5cycle(x, k) {
+        var a = x[0], b = x[1], c = x[2], d = x[3];
+
+        a = ff(a, b, c, d, k[0], 7, -680876936);
+        d = ff(d, a, b, c, k[1], 12, -389564586);
+        c = ff(c, d, a, b, k[2], 17, 606105819);
+        b = ff(b, c, d, a, k[3], 22, -1044525330);
+        a = ff(a, b, c, d, k[4], 7, -176418897);
+        d = ff(d, a, b, c, k[5], 12, 1200080426);
+        c = ff(c, d, a, b, k[6], 17, -1473231341);
+        b = ff(b, c, d, a, k[7], 22, -45705983);
+        a = ff(a, b, c, d, k[8], 7, 1770035416);
+        d = ff(d, a, b, c, k[9], 12, -1958414417);
+        c = ff(c, d, a, b, k[10], 17, -42063);
+        b = ff(b, c, d, a, k[11], 22, -1990404162);
+        a = ff(a, b, c, d, k[12], 7, 1804603682);
+        d = ff(d, a, b, c, k[13], 12, -40341101);
+        c = ff(c, d, a, b, k[14], 17, -1502002290);
+        b = ff(b, c, d, a, k[15], 22, 1236535329);
+
+        a = gg(a, b, c, d, k[1], 5, -165796510);
+        d = gg(d, a, b, c, k[6], 9, -1069501632);
+        c = gg(c, d, a, b, k[11], 14, 643717713);
+        b = gg(b, c, d, a, k[0], 20, -373897302);
+        a = gg(a, b, c, d, k[5], 5, -701558691);
+        d = gg(d, a, b, c, k[10], 9, 38016083);
+        c = gg(c, d, a, b, k[15], 14, -660478335);
+        b = gg(b, c, d, a, k[4], 20, -405537848);
+        a = gg(a, b, c, d, k[9], 5, 568446438);
+        d = gg(d, a, b, c, k[14], 9, -1019803690);
+        c = gg(c, d, a, b, k[3], 14, -187363961);
+        b = gg(b, c, d, a, k[8], 20, 1163531501);
+        a = gg(a, b, c, d, k[13], 5, -1444681467);
+        d = gg(d, a, b, c, k[2], 9, -51403784);
+        c = gg(c, d, a, b, k[7], 14, 1735328473);
+        b = gg(b, c, d, a, k[12], 20, -1926607734);
+
+        a = hh(a, b, c, d, k[5], 4, -378558);
+        d = hh(d, a, b, c, k[8], 11, -2022574463);
+        c = hh(c, d, a, b, k[11], 16, 1839030562);
+        b = hh(b, c, d, a, k[14], 23, -35309556);
+        a = hh(a, b, c, d, k[1], 4, -1530992060);
+        d = hh(d, a, b, c, k[4], 11, 1272893353);
+        c = hh(c, d, a, b, k[7], 16, -155497632);
+        b = hh(b, c, d, a, k[10], 23, -1094730640);
+        a = hh(a, b, c, d, k[13], 4, 681279174);
+        d = hh(d, a, b, c, k[0], 11, -358537222);
+        c = hh(c, d, a, b, k[3], 16, -722521979);
+        b = hh(b, c, d, a, k[6], 23, 76029189);
+        a = hh(a, b, c, d, k[9], 4, -640364487);
+        d = hh(d, a, b, c, k[12], 11, -421815835);
+        c = hh(c, d, a, b, k[15], 16, 530742520);
+        b = hh(b, c, d, a, k[2], 23, -995338651);
+
+        a = ii(a, b, c, d, k[0], 6, -198630844);
+        d = ii(d, a, b, c, k[7], 10, 1126891415);
+        c = ii(c, d, a, b, k[14], 15, -1416354905);
+        b = ii(b, c, d, a, k[5], 21, -57434055);
+        a = ii(a, b, c, d, k[12], 6, 1700485571);
+        d = ii(d, a, b, c, k[3], 10, -1894986606);
+        c = ii(c, d, a, b, k[10], 15, -1051523);
+        b = ii(b, c, d, a, k[1], 21, -2054922799);
+        a = ii(a, b, c, d, k[8], 6, 1873313359);
+        d = ii(d, a, b, c, k[15], 10, -30611744);
+        c = ii(c, d, a, b, k[6], 15, -1560198380);
+        b = ii(b, c, d, a, k[13], 21, 1309151649);
+        a = ii(a, b, c, d, k[4], 6, -145523070);
+        d = ii(d, a, b, c, k[11], 10, -1120210379);
+        c = ii(c, d, a, b, k[2], 15, 718787259);
+        b = ii(b, c, d, a, k[9], 21, -343485551);
+
+        x[0] = add32(a, x[0]);
+        x[1] = add32(b, x[1]);
+        x[2] = add32(c, x[2]);
+        x[3] = add32(d, x[3]);
+
+    }
+
+    function cmn(q, a, b, x, s, t) {
+        a = add32(add32(a, q), add32(x, t));
+        return add32((a << s) | (a >>> (32 - s)), b);
+    }
+
+    function ff(a, b, c, d, x, s, t) {
+        return cmn((b & c) | ((~b) & d), a, b, x, s, t);
+    }
+
+    function gg(a, b, c, d, x, s, t) {
+        return cmn((b & d) | (c & (~d)), a, b, x, s, t);
+    }
+
+    function hh(a, b, c, d, x, s, t) {
+        return cmn(b ^ c ^ d, a, b, x, s, t);
+    }
+
+    function ii(a, b, c, d, x, s, t) {
+        return cmn(c ^ (b | (~d)), a, b, x, s, t);
+    }
+
+    function md51(s) {
+        txt = '';
+        var n = s.length,
+            state = [1732584193, -271733879, -1732584194, 271733878], i;
+        for (i = 64; i <= s.length; i += 64) {
+            md5cycle(state, md5blk(s.substring(i - 64, i)));
+        }
+        s = s.substring(i - 64);
+        var tail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        for (i = 0; i < s.length; i++)
+            tail[i >> 2] |= s.charCodeAt(i) << ((i % 4) << 3);
+        tail[i >> 2] |= 0x80 << ((i % 4) << 3);
+        if (i > 55) {
+            md5cycle(state, tail);
+            for (i = 0; i < 16; i++) tail[i] = 0;
+        }
+        tail[14] = n * 8;
+        md5cycle(state, tail);
+        return state;
+    }
+
+    /* there needs to be support for Unicode here, unless we pretend that we can redefine the MD-5
+     * algorithm for multi-byte characters (perhaps by adding every four 16-bit characters and
+     * shortening the sum to 32 bits). Otherwise I suggest performing MD-5 as if every character
+     * was two bytes--e.g., 0040 0025 = @%--but then how will an ordinary MD-5 sum be matched?
+     * There is no way to standardize text to something like UTF-8 before transformation; speed cost is
+     * utterly prohibitive. The JavaScript standard itself needs to look at this: it should start
+     * providing access to strings as preformed UTF-8 8-bit unsigned value arrays.
+     */
+    function md5blk(s) { /* I figured global was faster.   */
+        var md5blks = [], i;
+        /* Andy King said do it this way. */
+        for (i = 0; i < 64; i += 4) {
+            md5blks[i >> 2] = s.charCodeAt(i)
+                + (s.charCodeAt(i + 1) << 8)
+                + (s.charCodeAt(i + 2) << 16)
+                + (s.charCodeAt(i + 3) << 24);
+        }
+        return md5blks;
+    }
+
+    var hex_chr = '0123456789abcdef'.split('');
+
+    function rhex(n) {
+        var s = '', j = 0;
+        for (; j < 4; j++)
+            s += hex_chr[(n >> (j * 8 + 4)) & 0x0F]
+                + hex_chr[(n >> (j * 8)) & 0x0F];
+        return s;
+    }
+
+    function hex(x) {
+        for (var i = 0; i < x.length; i++)
+            x[i] = rhex(x[i]);
+        return x.join('');
+    }
+
+    this.md5 = function md5(s) {
+        return hex(md51(s));
+    };
+
+    /* this function is much faster,
+     so if possible we use it. Some IEs
+     are the only ones I know of that
+     need the idiotic second function,
+     generated by an if clause.  */
+
+    function add32(a, b) {
+        return (a + b) & 0xFFFFFFFF;
+    }
+
+    if (this.md5('hello') != '5d41402abc4b2a76b9719d911017c592') {
+        function add32(x, y) {
+            var lsw = (x & 0xFFFF) + (y & 0xFFFF),
+                msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+            return (msw << 16) | (lsw & 0xFFFF);
+        }
+    }
+};
 
 //------------------------------------------------------------------------
 // LOCAL STORAGE, SESSION AND GRAPHICS
@@ -113,6 +303,7 @@ var thclient = new function () {
      * 4. Load data from server? if session hash have changed
      */
     this.sync = function sync() {
+        thclient.thmsg('Sync data.');
         if (localStorage['data'] !== JSON.stringify(thclient.data)) {
             thclient.loadData();
             thclient.id = null;
@@ -148,14 +339,159 @@ var thclient = new function () {
             thclient.notify('warning', 'Unable to sync data.');
             console.warn(e);
         }
+        if (thclient.noty !== null) {
+            thclient.noty.close();
+        }
     };
 
     this.loadData = function loadData() {
         thclient.data = JSON.parse(localStorage['data']);
-    } ;
+    };
 
     this.saveData = function saveData() {
         localStorage['data'] = JSON.stringify(thclient.data);
+    };
+
+    this.createTable = function createTable(data, holder) {
+        try {
+            var table = $('<table/>', {id: 'wordsTable', 'class': 'list', width: '100%'}),
+                colgroup = $('<colgroup/>', {span: data.table.length}),
+                thead = $('<thead/>'),
+                tbody = $('<tbody/>'),
+                tr = $('<tr/>', {'class': 'first'}),
+                td;
+
+            $(data.table).each(function (index, col) {
+                $(colgroup).append($('<col/>', {span: 1, width: col.width}));
+                $(tr).append($('<td/>', {text: col.col}));
+            });
+            $(thead).append(tr);
+
+            $(data.category).each(function (index, c) {
+                $(tbody).append('<tr class="cat">'
+                    + '<td>' + c.id + '<\/td>'
+                    + '<td>' + c.rank + '<\/td>'
+                    + '<td>' + c.name + '<\/td>'
+                    + '<td>' + data.locale.category + '<\/td>'
+                    + '<td>' + c.count + '<\/td>'
+                    + '<td>' + c.average + '<\/td>'
+                    + '<td>' + c.freq + '<\/td>'
+                    + '<\/tr>');
+                $(data.key).each(function (i, k) {
+                    if (k.link === c.id) {
+                        $(tbody).append('<tr class="key data-link-id-' + k.link + ' hidden>'
+                            + '<td>' + k.id + '<\/td>'
+                            + '<td>' + k.rank + '<\/td>'
+                            + '<td>' + k.name + '<\/td>'
+                            + '<td>' + data.locale.word + '<\/td>'
+                            + '<td>' + k.count + '<\/td>'
+                            + '<td>-<\/td>'
+                            + '<td>-<\/td>'
+                            + '<\/tr>');
+                    }
+                });
+            });
+            $(table).append(colgroup).append(thead).append(tbody);
+            $("#" + holder).html(table);
+        } catch (e) {
+            console.warn(e);
+        }
+    };
+
+    // Returns a flattened hierarchy containing all leaf nodes under the root.
+    function toFlatArray(root) {
+        var nodes = [],
+            name;
+        $(root.key).each(function (index, key) {
+            var nodeName = "",
+                i;
+            for (i = 0; i < root.category.length; i++) {
+                if (root.category[i].id === key.link) {
+                    name = root.category[i].name;
+                    break;
+                }
+            }
+            nodes.push({packageName: name, className: key.name, value: key.count});
+        });
+        return nodes;
+    }
+
+    function treeToFlatArray(root) {
+        var nodes = [];
+        function recurse(name, node) {
+            if (node.children) {
+                node.children.forEach(function (child) { recurse(node.name, child); });
+            } else {
+                nodes.push({packageName: name, className: node.name, value: node.count});
+            }
+        }
+        root.words.forEach(function (node) {recurse(null, node); });
+        return nodes;
+    }
+
+    // holder - is an ID name
+    this.drawBarChart = function drawBarChart(data, holder, size) {
+        var r = new Raphael(holder, size, (data.key.length * 40)),
+            txtattr = { font: "12px sans-serif", anchor: "left" },
+            typeattr = {type: "sharp", fill: "#2f69bf"},
+            i;
+        for (i = 0; i < data.key.length; i++) {
+            r.text(100, (15 + i * 40), data.key[i].name).attr(txtattr);
+            r.barchart(200, (-10 + i * 40), 400, 50, data.key[i].interval, 0).attr(typeattr);
+        }
+    };
+
+    // holder - is an ID name
+    this.drawCircleChart = function drawCircleChart(data, holder, diameter) {
+        function classes(root) {
+            return {children: toFlatArray(root)};
+        }
+        var format = d3.format(",d"),
+            color = d3.scale.category20c(),
+            bubble = d3.layout.pack().sort(null).size([diameter, diameter]).padding(1.5),
+            svg = d3.select("#" + holder).append("svg").attr("width", diameter).attr("height", diameter).attr("class", "bubble"),
+            node = svg.selectAll(".node")
+                .data(bubble.nodes(classes(data))
+                    .filter(function (d) { return !d.children; }))
+                .enter().append("g")
+                .attr("class", "node")
+                .attr("transform", function (d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+        node.append("title").text(function (d) { return d.className + " [" + d.packageName + "]: " + format(d.value); });
+        node.append("circle").attr("r", function (d) { return d.r; }).style("fill", function (d) { return color(d.packageName); });
+        node.append("text").attr("dy", ".2em").style("text-anchor", "middle").text(function (d) { return d.className.substring(0, d.r / 4); });
+        d3.select(self.frameElement).style("height", diameter + "px");
+    };
+
+    this.drawCloudChart = function drawCloudChart(data, holder, size) {
+        var fill = d3.scale.category20();
+        function draw(elem) {
+            d3.select("#" + holder).append("svg")
+                .attr("width", size)
+                .attr("height", size)
+                .append("g")
+                .attr("transform", "translate(" + size / 2 + "," + size / 2 + ")")
+                .selectAll("text")
+                .data(elem)
+                .enter().append("text")
+                .style("font-size", function (d) { return d.size + "px"; })
+                .style("font-family", "Impact")
+                .style("fill", function (d, i) { return fill(i); })
+                .attr("text-anchor", "middle")
+                .attr("transform", function (d) {return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")"; })
+                .text(function (d) { return d.text; });
+        }
+
+        d3.layout.cloud().size([size, size])
+            .words(toFlatArray(data).map(function (d) {
+                return {text: d.className, size: d.value * 12}; // Set font size here only
+            }))
+            .rotate(function () { return ~~(Math.random() * 2) * 90; })
+            .font("Impact")
+            .fontSize(function (d) { return d.size; })
+            .on("end", draw)
+            .start();
+
     };
 };
 //------------------------------------------------------------------------
@@ -543,42 +879,67 @@ var thhandler = new function () {
 
     /** Content analysis graphics */
     this.caGraphics = function caGraphics() {
-        dataShowLoading();
-        $.ajax({
-            type: 'GET',
-            url: '/texthistory/content/graph/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'html'
-        }).done(function (data) {
-                changePage('Графики распределенности',
-                    [
-                        {id: 'sep', text: ''}
-                    ],
-                    data);
-            }).fail(function () {
-                thclient.notify('error', 'Unable to reach the server.');
-            });
+        thclient.sync();
+        changePage('Графики',
+            [
+                {id: 'nav-ca-g-f', text: 'Частота'},
+                {id: 'nav-ca-g-g', text: 'Корреляция'},
+                {id: 'nav-ca-g-t', text: 'Облако тегов'},
+                {id: 'nav-ca-g-c', text: 'Круг тегов'},
+                {id: 'sep', text: ''}
+            ],
+            thclient.drawBarChart(thclient.data, 'content', 600));
+    };
+
+    this.caGraphicsCor = function caGraphicsCor() {
+        thclient.sync();
+        changePage('Графики - Корреляция',
+            [
+                {id: 'nav-ca-g-f', text: 'Частота'},
+                {id: 'nav-ca-g-g', text: 'Корреляция'},
+                {id: 'nav-ca-g-t', text: 'Облако тегов'},
+                {id: 'nav-ca-g-c', text: 'Круг тегов'},
+                {id: 'sep', text: ''}
+            ],
+            'Not implemented.');
+    };
+
+    this.caGraphicsTag = function caGraphicsTag() {
+        thclient.sync();
+        changePage('Графики - Облако тегов',
+            [
+                {id: 'nav-ca-g-f', text: 'Частота'},
+                {id: 'nav-ca-g-g', text: 'Корреляция'},
+                {id: 'nav-ca-g-t', text: 'Облако тегов'},
+                {id: 'nav-ca-g-c', text: 'Круг тегов'},
+                {id: 'sep', text: ''}
+            ],
+            thclient.drawCloudChart(thclient.data, 'content', 600));
+    };
+
+    this.caGraphicsCat = function caGraphicsCat() {
+        thclient.sync();
+        changePage('Графики - Круг тегов',
+            [
+                {id: 'nav-ca-g-f', text: 'Частота'},
+                {id: 'nav-ca-g-g', text: 'Корреляция'},
+                {id: 'nav-ca-g-t', text: 'Облако тегов'},
+                {id: 'nav-ca-g-c', text: 'Круг тегов'},
+                {id: 'sep', text: ''}
+            ],
+            thclient.drawCircleChart(thclient.data, 'content', 600));
     };
 
     // --- CONTENT ANALYSIS :: KEY LIST ---
     /** Content analysis key words list */
     this.caKeyList = function caKeyList() {
-        dataShowLoading();
-        $.ajax({
-            type: 'GET',
-            url: '/texthistory/content/key/list/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'html'
-        }).done(function (data) {
-                changePage('Ключевые слова/категории',
-                    [
-                        {id: 'do-cont-key-list-view', text: 'Просмотреть'},
-                        {id: 'sep', text: ''}
-                    ],
-                    data);
-            }).fail(function () {
-                thclient.notify('error', 'Unable to reach the server.');
-            });
+        thclient.sync();
+        changePage('Ключевые слова/категории',
+            [
+                {id: 'do-cont-key-list-view', text: 'Просмотреть'},
+                {id: 'sep', text: ''}
+            ],
+            thclient.drawCircleChart(thclient.data, 'content', 600));
     };
 
     // --- CONTENT ANALYSIS :: KEY VIEW ---
@@ -650,7 +1011,15 @@ $(document).on('click', '#do-proj-view-status', thhandler.projectViewSourceStatu
 $('#nav-ca-s').click(thhandler.caStatistics);
 
 // --- CONTENT ANALYSIS :: GRAPHICS ---
-$('#nav-ca-g').click(thhandler.caGraphics);
+$('#nav-ca-g').click(thhandler.caGraphics);      // default -- frequency
+
+$('#nav-ca-g-f').click(thhandler.caGraphics);    // frequency
+
+$('#nav-ca-g-g').click(thhandler.caGraphicsCor); // correlation graph
+
+$('#nav-ca-g-t').click(thhandler.caGraphicsTag); // tag cloud
+
+$('#nav-ca-g-c').click(thhandler.caGraphicsCat); // tag categories
 
 // --- CONTENT ANALYSIS :: KEY LIST ---
 $('#nav-ca-t').click(thhandler.caKeyList);
@@ -703,7 +1072,6 @@ $('#do-resize').click(function () {
 
 $('#do-sync').click(function () {
 
-    thclient.notify('information', 'Sync with server is now disabled.');
 });
 
 // --- Tables Selection ---
