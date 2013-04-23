@@ -23,9 +23,13 @@ $(function initialization() {
     $('.tip').tipTip();
     // localStorage
     //    session hash -- session/project status
-    localStorage['hash'] = "";
-    //    data -- 
-    localStorage['data'] = "";
+    if (localStorage['hash'] === undefined) { // only for first time use
+        localStorage['hash'] = "";
+    }
+    //    data --
+    if (localStorage['data'] === undefined) { // only for first time use
+        localStorage['data'] = "";
+    }
 });
 
 //------------------------------------------------------------------------
@@ -66,7 +70,7 @@ function dataShowLoading() {
 function changePage(position, asideItems, data) {
     $('#position').text(position);
     generateAside(asideItems);
-    $('#content').html(data);
+    $('#data').html(data);
 }
 
 //------------------------------------------------------------------------
@@ -301,9 +305,14 @@ var thclient = new function () {
      * 2. Load data from storage, if necessary.
      * 3. Check state (project and session hash)
      * 4. Load data from server? if session hash have changed
+     *
+     * Possible states (return):
+     * 0 -- sync successfully.
+     * 1 -- hash not valid for server (no project selected)
+     * 2 -- communication error.
      */
     this.sync = function sync() {
-        thclient.thmsg('Sync data.');
+        thclient.thmsg('Sync data. Please stand by.');
         if (localStorage['data'] !== JSON.stringify(thclient.data)) {
             thclient.loadData();
             thclient.id = null;
@@ -316,10 +325,13 @@ var thclient = new function () {
                 contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                 dataType: 'json'
             }).done(function (data) {
-                    hash = data.hash;
+                    hash = data.hash; // hash will be empty if no project selected
                 }).fail(function () {
                     throw 'Unable to sync data.';
                 });
+            if (hash === '') {
+                return 1;
+            }
             if (localStorage['hash'] !== hash) {
                 $.ajax({
                     type: 'POST',
@@ -338,10 +350,12 @@ var thclient = new function () {
         } catch (e) {
             thclient.notify('warning', 'Unable to sync data.');
             console.warn(e);
+            return 2;
         }
         if (thclient.noty !== null) {
             thclient.noty.close();
         }
+        return 0;
     };
 
     this.loadData = function loadData() {
@@ -379,7 +393,7 @@ var thclient = new function () {
                     + '<\/tr>');
                 $(data.key).each(function (i, k) {
                     if (k.link === c.id) {
-                        $(tbody).append('<tr class="key data-link-id-' + k.link + ' hidden>'
+                        $(tbody).append('<tr class="key data-link-id-' + k.link + ' hidden">'
                             + '<td>' + k.id + '<\/td>'
                             + '<td>' + k.rank + '<\/td>'
                             + '<td>' + k.name + '<\/td>'
@@ -510,6 +524,8 @@ var thhandler = new function () {
             dataType: 'json'
         }).done(function (data) {
                 if (data.code === 0) {
+                    localStorage['hash'] = '';
+                    localStorage['data'] = '';
                     window.location = '/texthistory/';
                 } else {
                     thclient.notify('error', data.msg);
@@ -860,86 +876,122 @@ var thhandler = new function () {
     // --- CONTENT ANALYSIS :: STATISTICS ---
     /** Content analysis statistics */
     this.caStatistics = function caStatistics() {
-        dataShowLoading();
-        $.ajax({
-            type: 'GET',
-            url: '/texthistory/content/statistic/',
-            contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
-            dataType: 'html'
-        }).done(function (data) {
-                changePage('Статистика данных',
-                    [
-                        {id: 'sep', text: ''}
-                    ],
-                    data);
-            }).fail(function () {
-                thclient.notify('error', 'Unable to reach the server.');
-            });
+        var status = thclient.sync();
+        if (status === 0) {
+            var table = $('<table/>', {id: 'statTable', 'class': 'list', width: '100%'}),
+                colgroup = $('<colgroup/>', {span: '2'}).append('<col span="1" width="200px"><col span="1">'),
+                thead = $('<thead/>').append('<tr class="first"><td>Параметр</td><td>Значение</td></tr>'),
+                tbody = $('<tbody/>').append('<tr><td>Число слов</td><td>' + thclient.data.count + '</td></tr>')
+                                     .append('<tr><td>Средняя длина слова</td><td>' + thclient.data.avLength + '</td></tr>')
+                                     .append('<tr><td>Число ключевых слов</td><td>' + thclient.data.key.length + '</td></tr>');
+
+            $(table).append(colgroup).append(thead).append(tbody);
+
+            changePage('Статистика данных',
+                [
+                    {id: 'sep', text: ''}
+                ],
+                table);
+        } else {
+            if (status === 1) {
+                thclient.notify('warning', 'No project selected.');
+            }
+        }
     };
 
     /** Content analysis graphics */
     this.caGraphics = function caGraphics() {
-        thclient.sync();
-        changePage('Графики',
-            [
-                {id: 'nav-ca-g-f', text: 'Частота'},
-                {id: 'nav-ca-g-g', text: 'Корреляция'},
-                {id: 'nav-ca-g-t', text: 'Облако тегов'},
-                {id: 'nav-ca-g-c', text: 'Круг тегов'},
-                {id: 'sep', text: ''}
-            ],
-            thclient.drawBarChart(thclient.data, 'content', 600));
+        var status = thclient.sync();
+        if (status === 0) {
+            changePage('Графики',
+                [
+                    {id: 'nav-ca-g-f', text: 'Частота'},
+                    {id: 'nav-ca-g-g', text: 'Корреляция'},
+                    {id: 'nav-ca-g-t', text: 'Облако тегов'},
+                    {id: 'nav-ca-g-c', text: 'Круг тегов'},
+                    {id: 'sep', text: ''}
+                ],
+                thclient.drawBarChart(thclient.data, 'content', 600));
+        } else {
+            if (status === 1) {
+                thclient.notify('warning', 'No project selected.');
+            }
+        }
     };
 
     this.caGraphicsCor = function caGraphicsCor() {
-        thclient.sync();
-        changePage('Графики - Корреляция',
-            [
-                {id: 'nav-ca-g-f', text: 'Частота'},
-                {id: 'nav-ca-g-g', text: 'Корреляция'},
-                {id: 'nav-ca-g-t', text: 'Облако тегов'},
-                {id: 'nav-ca-g-c', text: 'Круг тегов'},
-                {id: 'sep', text: ''}
-            ],
-            'Not implemented.');
+        var status = thclient.sync();
+        if (status === 0) {
+            changePage('Графики - Корреляция',
+                [
+                    {id: 'nav-ca-g-f', text: 'Частота'},
+                    {id: 'nav-ca-g-g', text: 'Корреляция'},
+                    {id: 'nav-ca-g-t', text: 'Облако тегов'},
+                    {id: 'nav-ca-g-c', text: 'Круг тегов'},
+                    {id: 'sep', text: ''}
+                ],
+                'Not implemented.');
+        } else {
+            if (status === 1) {
+                thclient.notify('warning', 'No project selected.');
+            }
+        }
     };
 
     this.caGraphicsTag = function caGraphicsTag() {
-        thclient.sync();
-        changePage('Графики - Облако тегов',
-            [
-                {id: 'nav-ca-g-f', text: 'Частота'},
-                {id: 'nav-ca-g-g', text: 'Корреляция'},
-                {id: 'nav-ca-g-t', text: 'Облако тегов'},
-                {id: 'nav-ca-g-c', text: 'Круг тегов'},
-                {id: 'sep', text: ''}
-            ],
-            thclient.drawCloudChart(thclient.data, 'content', 600));
+        var status = thclient.sync();
+        if (status === 0) {
+            changePage('Графики - Облако тегов',
+                [
+                    {id: 'nav-ca-g-f', text: 'Частота'},
+                    {id: 'nav-ca-g-g', text: 'Корреляция'},
+                    {id: 'nav-ca-g-t', text: 'Облако тегов'},
+                    {id: 'nav-ca-g-c', text: 'Круг тегов'},
+                    {id: 'sep', text: ''}
+                ],
+                thclient.drawCloudChart(thclient.data, 'data', 600));
+        } else {
+            if (status === 1) {
+                thclient.notify('warning', 'No project selected.');
+            }
+        }
     };
 
     this.caGraphicsCat = function caGraphicsCat() {
-        thclient.sync();
-        changePage('Графики - Круг тегов',
-            [
-                {id: 'nav-ca-g-f', text: 'Частота'},
-                {id: 'nav-ca-g-g', text: 'Корреляция'},
-                {id: 'nav-ca-g-t', text: 'Облако тегов'},
-                {id: 'nav-ca-g-c', text: 'Круг тегов'},
-                {id: 'sep', text: ''}
-            ],
-            thclient.drawCircleChart(thclient.data, 'content', 600));
+        var status = thclient.sync();
+        if (status === 0) {
+            changePage('Графики - Круг тегов',
+                [
+                    {id: 'nav-ca-g-f', text: 'Частота'},
+                    {id: 'nav-ca-g-g', text: 'Корреляция'},
+                    {id: 'nav-ca-g-t', text: 'Облако тегов'},
+                    {id: 'nav-ca-g-c', text: 'Круг тегов'},
+                    {id: 'sep', text: ''}
+                ],
+                thclient.drawCircleChart(thclient.data, 'data', 600));
+        } else {
+            if (status === 1) {
+                thclient.notify('warning', 'No project selected.');
+            }
+        }
     };
 
     // --- CONTENT ANALYSIS :: KEY LIST ---
     /** Content analysis key words list */
     this.caKeyList = function caKeyList() {
-        thclient.sync();
-        changePage('Ключевые слова/категории',
-            [
-                {id: 'do-cont-key-list-view', text: 'Просмотреть'},
-                {id: 'sep', text: ''}
-            ],
-            thclient.drawCircleChart(thclient.data, 'content', 600));
+        var status = thclient.sync();
+        if (status === 0) {
+            changePage('Ключевые слова/категории',
+                [
+                    {id: 'do-cont-key-list-view', text: 'Просмотреть'},
+                    {id: 'sep', text: ''}
+                ],
+                thclient.createTable(thclient.data, 'data'));
+        } else {
+            if (status === 1) {
+                thclient.notify('warning', 'No project selected.');
+            }
+        }
     };
 
     // --- CONTENT ANALYSIS :: KEY VIEW ---
