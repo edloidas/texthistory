@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 /**
  * Source Controller, that handles requests for sources adding, removing and including.
  *
- * @author Никита
+ * @author edloidas
  */
 @Controller
 @RequestMapping(value = "/source")

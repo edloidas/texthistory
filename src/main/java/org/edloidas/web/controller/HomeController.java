@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Home Controller, that handles requests for login, registration and home page.
  *
- * @author Никита
+ * @author edloidas
  */
 @Controller
 @SessionAttributes({"userSession"})
@@ -95,7 +95,7 @@ public class HomeController {
      * @return {@code String}, that represents text response of operation success.
      */
     @RequestMapping(value = "/home", method = RequestMethod.GET)
-    String base(Model model) {
+    public String base(Model model) {
         try {
             if (!userSession.isLogged()) {
                 throw new NotAuthorizedException("Access denied. User not authorized.");

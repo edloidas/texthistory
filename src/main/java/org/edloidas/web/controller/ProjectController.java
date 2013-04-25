@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Project Controller, that handles requests for project operations and source adding.
  *
- * @author Никита
+ * @author edloidas
  */
 @Controller
 @RequestMapping(value = "/project")

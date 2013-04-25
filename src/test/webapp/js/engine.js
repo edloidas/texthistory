@@ -318,18 +318,26 @@ var thclient = new function () {
             thclient.id = null;
         }
         try {
-            var hash;
+            var hash, code;
             $.ajax({
                 type: 'POST',
                 url: '/texthistory/session/hash/',
                 contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                 dataType: 'json'
             }).done(function (data) {
+                    if (data.code == 3) { // server error
+                        throw 'Server error.';
+                    }
+                    code = data.code;
                     hash = data.hash; // hash will be empty if no project selected
                 }).fail(function () {
                     throw 'Unable to sync data.';
                 });
-            if (hash === '') {
+            if (code === 1) { // return to login page if not logged in
+                window.location = '/texthistory';
+                return 3;
+            }
+            if (code === 2 || hash === '') { // no project selected
                 return 1;
             }
             if (localStorage['hash'] !== hash) {
@@ -339,7 +347,10 @@ var thclient = new function () {
                     contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                     dataType: 'json'
                 }).done(function (data) {
-                        thclient.data = data;
+                        if (data.code == 3) { // server error
+                            throw 'Server error.';
+                        }
+                        thclient.data = data.data;
                         localStorage['data'] = JSON.stringify(thclient.data);
                         localStorage['hash'] = hash;
                     }).fail(function () {

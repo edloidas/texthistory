@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * Basic Controller, that handles requests and shows the start page.
  *
- * @author Никита
+ * @author edloidas
  */
 @Controller
 public class IndexController {

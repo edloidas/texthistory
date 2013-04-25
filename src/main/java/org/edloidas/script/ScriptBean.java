@@ -11,7 +11,7 @@ import javax.annotation.Resource;
 /**
  * ScriptBean, that runs scripts after application context done loading.
  *
- * @author Никита
+ * @author edloidas
  * @see org.springframework.beans.factory.InitializingBean
  */
 public class ScriptBean implements InitializingBean {

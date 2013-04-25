@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * Content Controller, that handles requests for content analysis.
  *
- * @author Никита
+ * @author edloidas
  */
 @Controller
 @RequestMapping(value = "/content")
@@ -80,7 +80,7 @@ public class ContentController {
      * @return {@code String}, that represents text response of operation success.
      */
     @RequestMapping(value = "/statistic", method = RequestMethod.GET)
-    String content(Model model) {
+    public String content(Model model) {
         try {
             if (!userSession.isLogged()) {
                 throw new NotAuthorizedException("Access denied. User not authorized.");
@@ -126,7 +126,7 @@ public class ContentController {
      * @return {@code String}, that represents text response of operation success.
      */
     @RequestMapping(value = "/key/list", method = RequestMethod.GET)
-    String contentKeyList(Model model) {
+    public String contentKeyList(Model model) {
         try {
             if (!userSession.isLogged()) {
                 throw new NotAuthorizedException("Access denied. User not authorized.");
@@ -220,7 +220,7 @@ public class ContentController {
      * @return {@code String}, that represents text response of operation success.
      */
     @RequestMapping(value = "/graph", method = RequestMethod.GET)
-    String contentMeaningfulGraph(Model model) {
+    public String contentMeaningfulGraph(Model model) {
         try {
             if (!userSession.isLogged()) {
                 throw new NotAuthorizedException("Access denied. User not authorized.");

@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * Content Controller, that handles requests for content analysis.
  *
- * @author Никита
+ * @author edloidas
  */
 @Controller
 @RequestMapping(value = "/psycho")
@@ -79,7 +79,7 @@ public class PsychoController {
      * @return {@code String}, that represents text response of operation success.
      */
     @RequestMapping(value = "/", method = RequestMethod.GET)
-    String psycho(Model model) {
+    public String psycho(Model model) {
         try {
             if (!userSession.isLogged()) {
                 throw new Exception("Access denied. User not authorized.");

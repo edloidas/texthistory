@@ -1,15 +1,20 @@
+# Compiled files #
+##################
 *.class
 
 # Package Files #
+#################
 *.jar
 *.war
 *.ear
 
 # Directories #
+###############
 target/
 sql/
 
 # IDEA Project #
+################
 *.iml
 *.iws
 *.ipr
