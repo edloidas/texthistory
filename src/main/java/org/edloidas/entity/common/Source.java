@@ -16,7 +16,7 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "source")
-public class Source implements CommonEntity {
+public class Source extends CommonEntity {
 
     /** Auto incremented identifier */
     @Id
@@ -143,5 +143,40 @@ public class Source implements CommonEntity {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    @Override
+    public String toJson() {
+        this.id = id;
+        this.name = name;
+        this.text = text;
+        Date now = new Date();
+        this.uploaded = new Timestamp(now.getTime());
+        this.md5 = md5;
+        this.project = project;
+        this.status = true;
+
+        StringBuilder json = new StringBuilder();
+        json.append("{");
+        json.append("\"id\":").append(this.id);
+        if (this.name != null) {
+            json.append(",\"name\":\"").append(this.name.replace("\"", "\\\"")).append("\"");
+        }
+        // Excluded because of great size of response data.
+//        if (this.text != null) {
+//            json.append(",\"description\":\"").append(this.text.replace("\"", "\\\"")).append("\"");
+//        }
+        if (this.uploaded != null) {
+            json.append(",\"updated\":\"").append(this.uploaded).append("\"");
+        }
+        if (this.md5 != null) {
+            json.append(",\"md5\":\"").append(this.md5).append("\"");
+        }
+        if (this.status != null) {
+            json.append(",\"status\":").append(this.status);
+        }
+        json.append("}");
+
+        return json.toString();
     }
 }

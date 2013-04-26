@@ -42,6 +42,14 @@ public class SessionController {
     private SessionService userSession;
 
     /**
+     * Source service for CRUD operations.
+     *
+     * @see org.edloidas.web.service.common.SourceService
+     */
+    @Resource(name = "sourceService")
+    private EntityService<Source> sourceService;
+
+    /**
      * Text session variables holder.
      *
      * @see org.edloidas.web.service.TextService
@@ -63,13 +71,13 @@ public class SessionController {
             Message msg;
             if (!userSession.isLogged()) {
                 msg = new SessionMessage(Message.CODE_NOT_LOGGED);
-                return msg.toString();
+            } else { // empty hash is equals to "no project selected"
+                msg = new SessionMessage(Message.CODE_SUCCESS, userSession.getHash());
             }
-
-            return "content-statistic";
+            return msg.toString();
         } catch (Exception ex) {
             LOGGER.error("Server error.", ex);
-            return "server-error";
+            return "{\"code\":" + Message.CODE_SERVER_ERROR + "}";
         }
     }
 }

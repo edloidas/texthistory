@@ -14,7 +14,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "stopwords_word")
-public class StopWord implements CommonEntity {
+public class StopWord extends CommonEntity {
 
     /** Auto incremented identifier */
     @Id

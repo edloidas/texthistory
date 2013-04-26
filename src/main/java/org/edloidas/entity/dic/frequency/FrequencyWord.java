@@ -14,7 +14,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "frequency_word")
-public class FrequencyWord implements CommonEntity {
+public class FrequencyWord extends CommonEntity {
 
     /** Auto incremented identifier */
     @Id

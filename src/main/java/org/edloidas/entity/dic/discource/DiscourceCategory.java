@@ -15,7 +15,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "discource_category")
-public class DiscourceCategory implements CommonEntity {
+public class DiscourceCategory extends CommonEntity {
 
     /** Identifier */
     @Id

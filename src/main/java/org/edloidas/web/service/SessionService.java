@@ -33,15 +33,18 @@ public class SessionService {
     private boolean logged;
     /** Log status indicator */
     private boolean textUpdated;
+    /** Project hash. */
+    private String hash;
 
     /** Basic constructor. Set all field to "none" string. */
     public SessionService() {
-        user = new User();
-        project = new Project();
-        project.setId(-1);
-        project.setName("не выбран");
-        logged = false;
-        textUpdated = false;
+        this.user = new User();
+        this.project = new Project();
+        this.project.setId(-1);
+        this.project.setName("не выбран");
+        this.logged = false;
+        this.textUpdated = false;
+        this.hash = "";
     }
 
     /**
@@ -100,6 +103,7 @@ public class SessionService {
      */
     public void setLogged(boolean logged) {
         this.logged = logged;
+        this.hash = "";
     }
 
     public boolean isTextUpdated() {
@@ -108,6 +112,14 @@ public class SessionService {
 
     public void setTextUpdated(boolean textUpdated) {
         this.textUpdated = textUpdated;
+    }
+
+    public String getHash() {
+        return hash;
+    }
+
+    public void setHash(String hash) {
+        this.hash = hash;
     }
 
     /**
@@ -158,6 +170,7 @@ public class SessionService {
             this.project.setId(-1);
             this.project.setName("не выбран");
             this.textUpdated = false;
+            this.hash = "";
         } catch (Exception ex) {
             LOGGER.info(ex.getMessage());
             return false;

@@ -5,6 +5,9 @@ import org.edloidas.entity.common.Project;
 import org.edloidas.entity.common.Source;
 import org.edloidas.web.exception.NotAuthorizedException;
 import org.edloidas.web.json.JsonData;
+import org.edloidas.web.json.Message;
+import org.edloidas.web.json.ProjectListMessage;
+import org.edloidas.web.json.SimpleMessage;
 import org.edloidas.web.service.EntityService;
 import org.edloidas.web.service.SessionService;
 import org.springframework.stereotype.Controller;
@@ -73,58 +76,23 @@ public class ProjectController {
      *
      * @return {@code String}, that represents view.
      */
-    @RequestMapping(value = "/list", method = RequestMethod.GET,
+    @RequestMapping(value = "/list", method = RequestMethod.POST,
             produces = "application/json; charset=utf-8")
-    public String projectList(Model model) {
+    public
+    @ResponseBody
+    String projectList() {
         try {
+            Message msg;
             if (!userSession.isLogged()) {
-                throw new NotAuthorizedException("Access denied. User not authorized.");
+                msg = new SimpleMessage(Message.CODE_NOT_LOGGED);
+            } else {
+                msg = new ProjectListMessage(projectService.getAll(new Project(userSession.getUser())));
             }
 
-            List<Project> projects;
-            int count;
-
-            projects = projectService.getAll(new Project(userSession.getUser()));
-            count = projects.size();
-            model.addAttribute("projects", projects);
-            model.addAttribute("count", count);
-
-            model.addAttribute("sessionUser", userSession.getUser().getName());
-            model.addAttribute("sessionProject", userSession.getProject().getName());
-
-            return "project-list";
-        } catch (NotAuthorizedException ex) {
-            LOGGER.warn(ex.getMessage());
-            return "index";
+            return msg.toString();
         } catch (Exception ex) {
             LOGGER.error("Server error.", ex);
-            return "home";
-        }
-    }
-
-    /**
-     * Handles and retrieves the non-AJAX project add page.
-     *
-     * @return {@code String}, that represents view.
-     */
-    @RequestMapping(value = "/new", method = RequestMethod.GET,
-            produces = "application/json; charset=utf-8")
-    public String projectNew(Model model) {
-        try {
-            if (!userSession.isLogged()) {
-                throw new NotAuthorizedException("Access denied. User not authorized.");
-            }
-
-            model.addAttribute("sessionUser", userSession.getUser().getName());
-            model.addAttribute("sessionProject", userSession.getProject().getName());
-
-            return "project-add";
-        } catch (NotAuthorizedException ex) {
-            LOGGER.warn(ex.getMessage());
-            return "index";
-        } catch (Exception ex) {
-            LOGGER.error("Server error.", ex);
-            return "home";
+            return "{\"code\":" + Message.CODE_SERVER_ERROR + "}";
         }
     }
 
@@ -133,29 +101,26 @@ public class ProjectController {
      *
      * @return {@code String}, that represents text response of operation status.
      */
-    @RequestMapping(value = "/new/save", method = RequestMethod.POST,
+    @RequestMapping(value = "/new", method = RequestMethod.POST,
             produces = "application/json; charset=utf-8")
     public
     @ResponseBody
     String projectAdd(@RequestParam(value = "name", required = true) String name,
                       @RequestParam(value = "desc", required = true) String desc) {
         try {
+            Message msg;
             if (!userSession.isLogged()) {
-                return "{\"code\":2,\"msg\":\"Access denied.\",\"data\":\"User has no rights to do this.\"}";
+                msg = new SimpleMessage(Message.CODE_NOT_LOGGED);
+            } else {
+                Project project = new Project(name, desc, userSession.getUser());
+                projectService.addEntity(project);
+                msg = new SimpleMessage();
             }
 
-            JsonData json;
-
-            Project project = new Project(name, desc, userSession.getUser());
-
-            projectService.addEntity(project);
-
-            json = new JsonData(0, "Project added.", project.getName());
-
-            return json.toString();
+            return msg.toString();
         } catch (Exception ex) {
-            LOGGER.info(ex.getMessage());
-            return "{\"code\":1,\"msg\":\"Server error.\",\"data\":\"See server log.\"}";
+            LOGGER.error("Server error.", ex);
+            return "{\"code\":" + Message.CODE_SERVER_ERROR + "}";
         }
     }
 
@@ -170,35 +135,34 @@ public class ProjectController {
     @ResponseBody
     String projectDelete(@RequestParam(value = "id", required = true) String id) {
         try {
+            Message msg;
             if (!userSession.isLogged()) {
-                return "{\"code\":2,\"msg\":\"Access denied.\",\"data\":\"User has no rights to do this.\"}";
-            }
-
-            JsonData json;
-
-            Project project = new Project();
-            project.setId(Integer.parseInt(id));
-            /* TODO: Check, if user has permission to delete this project. And replace messages with codes. */
-
-            List<Source> src1 = sourceService.getAll(new Source(project));
-            List<Source> src2 = new ArrayList<>();
-            for (Source s : src1) {
-                src2.add(new Source(s.getId()));
-            }
-            project.setSources(src2);
-
-            projectService.deleteEntity(project);
-
-            if (project.getId() == userSession.getProject().getId()) {
-                userSession.closeProject();
-                json = new JsonData(3, "Project closed and deleted.", "none");
+                msg = new SimpleMessage(Message.CODE_NOT_LOGGED);
             } else {
-                json = new JsonData(0, "Project deleted.", "none");
+                Project project = new Project();
+                project.setId(Integer.parseInt(id));
+
+                /* TODO: Check, if user has permission to delete this project. Return CODE_NO_RIGHTS if no*/
+
+                List<Source> src1 = sourceService.getAll(new Source(project));
+                List<Source> src2 = new ArrayList<>();
+                for (Source s : src1) {
+                    src2.add(new Source(s.getId()));
+                }
+                project.setSources(src2);
+
+                projectService.deleteEntity(project);
+
+                if (project.getId() == userSession.getProject().getId()) {
+                    userSession.closeProject();
+                }
+                msg = new SimpleMessage();
             }
-            return json.toString();
+
+            return msg.toString();
         } catch (Exception ex) {
-            LOGGER.info(ex.getMessage());
-            return "{\"code\":1,\"msg\":\"Server error.\",\"data\":\"See server log.\"}";
+            LOGGER.error("Server error.", ex);
+            return "{\"code\":" + Message.CODE_SERVER_ERROR + "}";
         }
     }
 

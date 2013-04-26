@@ -16,7 +16,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "opcorpora_lemme_key")
-public class OpcorporaLemmeKey implements CommonEntity {
+public class OpcorporaLemmeKey extends CommonEntity {
 
     /** Identifier */
     @Id

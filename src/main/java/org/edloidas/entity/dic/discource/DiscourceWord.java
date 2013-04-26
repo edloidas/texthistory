@@ -13,7 +13,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "discource_word")
-public class DiscourceWord implements CommonEntity {
+public class DiscourceWord extends CommonEntity {
 
     /** Auto incremented identifier */
     @Id

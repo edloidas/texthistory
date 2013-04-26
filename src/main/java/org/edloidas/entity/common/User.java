@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "user")
-public class User implements CommonEntity {
+public class User extends CommonEntity {
 
     /** Auto incremented identifier */
     @Id

@@ -8,8 +8,6 @@ import java.io.Serializable;
  *
  * @author edloidas@gmail.com
  */
-public abstract class CommonEntity implements Entity {
-    public String toJson() {
-        return "{}";
-    }
+public interface Entity extends Serializable {
+    public String toJson();
 }

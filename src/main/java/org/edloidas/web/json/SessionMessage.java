@@ -24,7 +24,7 @@ public class SessionMessage implements Message {
     }
 
     public SessionMessage(String hash) {
-        this.code = 0;
+        this.code = Message.CODE_SUCCESS;
         this.hash = hash;
         this.data = null;
     }

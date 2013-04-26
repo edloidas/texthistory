@@ -15,7 +15,7 @@ import java.sql.Timestamp;
 // TODO: Implement Meta for db, or delete, if it's not needed anymore.
 @Entity
 @Table(name = "meta")
-public class Meta implements CommonEntity {
+public class Meta extends CommonEntity {
 
     /** Auto incremented identifier */
     @Id

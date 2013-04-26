@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "project")
-public class Project implements CommonEntity {
+public class Project extends CommonEntity {
 
     /** Auto incremented identifier */
     @Id
@@ -153,5 +153,30 @@ public class Project implements CommonEntity {
 
     public void setSources(List<Source> sources) {
         this.sources = sources;
+    }
+
+    @Override
+    public String toJson() {
+        StringBuilder json = new StringBuilder();
+        json.append("{");
+        json.append("\"id\":").append(this.id);
+        if (this.name != null) {
+            json.append(",\"name\":\"").append(this.name.replace("\"", "\\\"")).append("\"");
+        }
+        if (this.description != null) {
+            json.append(",\"description\":\"").append(this.description).append("\"");
+        }
+        if (this.description != null) {
+            json.append(",\"description\":\"").append(this.description).append("\"");
+        }
+        if (this.created != null) {
+            json.append(",\"created\":\"").append(this.created).append("\"");
+        }
+        if (this.updated != null) {
+            json.append(",\"updated\":\"").append(this.updated).append("\"");
+        }
+        json.append("}");
+
+        return json.toString();
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "abramov_key")
-public class AbramovKey implements CommonEntity {
+public class AbramovKey extends CommonEntity {
 
     /** Auto incremented identifier */
     @Id

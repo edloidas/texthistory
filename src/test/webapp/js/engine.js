@@ -76,7 +76,7 @@ function changePage(position, asideItems, data) {
 //------------------------------------------------------------------------
 // TOOLSET WITH EXTERNAL FUNCTIONS
 //------------------------------------------------------------------------
-var toolset = new function () {
+function Toolset() {
     // MD5 IMPLEMENTATION ==============================
     /**
      * Implementation of md5 hash function for javascript by Joseph's Myers
@@ -259,12 +259,13 @@ var toolset = new function () {
             return (msw << 16) | (lsw & 0xFFFF);
         }
     }
-};
+}
+var toolset = new Toolset();
 
 //------------------------------------------------------------------------
 // LOCAL STORAGE, SESSION AND GRAPHICS
 //------------------------------------------------------------------------
-var thclient = new function () {
+function ThClient() {
     this.data = null;
     this.id = null;
     // NOTY =========================================
@@ -325,7 +326,7 @@ var thclient = new function () {
                 contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                 dataType: 'json'
             }).done(function (data) {
-                    if (data.code == 3) { // server error
+                    if (data.code === 3) { // server error
                         throw 'Server error.';
                     }
                     code = data.code;
@@ -359,7 +360,7 @@ var thclient = new function () {
                 thclient.id = null;
             }
         } catch (e) {
-            thclient.notify('warning', 'Unable to sync data.');
+            thclient.notify('warning', e);
             console.warn(e);
             return 2;
         }
@@ -518,12 +519,14 @@ var thclient = new function () {
             .start();
 
     };
-};
+}
+var thclient = new ThClient();
+
 //------------------------------------------------------------------------
 // AJAX EVENTS HANDLERS
 //------------------------------------------------------------------------
 // TODO: Add GET requests. Add new object with functions and use predefined in events.
-var thhandler = new function () {
+function ThHandler() {
     //==================================================
     // LOGOUT ==========================================
     /** Handles logout POST request. */
@@ -1031,7 +1034,9 @@ var thhandler = new function () {
                 });
         }
     };
-};
+}
+var thhandler = new ThHandler();
+
 //------------------------------------------------------------------------
 // AJAX EVENTS
 //------------------------------------------------------------------------

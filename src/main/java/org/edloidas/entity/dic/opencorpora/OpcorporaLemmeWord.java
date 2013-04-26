@@ -14,7 +14,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "opcorpora_lemme_word")
-public class OpcorporaLemmeWord implements CommonEntity {
+public class OpcorporaLemmeWord extends CommonEntity {
 
     /** Identifier */
     @Id

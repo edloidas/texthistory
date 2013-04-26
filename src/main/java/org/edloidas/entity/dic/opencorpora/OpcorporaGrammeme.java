@@ -16,7 +16,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "opcorpora_grammeme")
-public class OpcorporaGrammeme implements CommonEntity {
+public class OpcorporaGrammeme extends CommonEntity {
 
     /** Identifier */
     @Id
