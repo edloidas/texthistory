@@ -4,10 +4,7 @@ import org.apache.log4j.Logger;
 import org.edloidas.entity.common.Project;
 import org.edloidas.entity.common.Source;
 import org.edloidas.web.exception.NotAuthorizedException;
-import org.edloidas.web.json.JsonData;
-import org.edloidas.web.json.Message;
-import org.edloidas.web.json.ProjectListMessage;
-import org.edloidas.web.json.SimpleMessage;
+import org.edloidas.web.json.*;
 import org.edloidas.web.service.EntityService;
 import org.edloidas.web.service.SessionService;
 import org.springframework.stereotype.Controller;
@@ -179,22 +176,24 @@ public class ProjectController {
     @ResponseBody
     String projectOpen(@RequestParam(value = "id", required = true) String id) {
         try {
+            Message msg;
             if (!userSession.isLogged()) {
-                return "{\"code\":2,\"msg\":\"Access denied.\",\"data\":\"User has no rights to do this.\"}";
+                msg = new SimpleMessage(Message.CODE_NOT_LOGGED);
+            } else {
+                Project project = projectService.getById(new Project(Integer.parseInt(id)));
+                if (userSession.setProject(project)) {
+                    userSession.setTextUpdated(false);
+                    msg = new SimpleMessage();
+                } else {
+                    msg = new SimpleMessage(Message.CODE_SERVER_ERROR);
+                }
+
             }
 
-            JsonData json;
-            Project project = projectService.getById(new Project(Integer.parseInt(id)));
-            if (userSession.setProject(project)) {
-                json = new JsonData(3, "Project with name [" + project.getName() + "] opened.", project.getName());
-                userSession.setTextUpdated(false);
-            } else {
-                json = new JsonData(2, "Project can not be opened.", "Something goes wrong.");
-            }
-            return json.toString();
+            return msg.toString();
         } catch (Exception ex) {
-            LOGGER.info(ex.getMessage());
-            return "{\"code\":1,\"msg\":\"Server error.\",\"data\":\"See server log.\"}";
+            LOGGER.error("Server error.", ex);
+            return "{\"code\":" + Message.CODE_SERVER_ERROR + "}";
         }
     }
 
@@ -206,45 +205,31 @@ public class ProjectController {
     /* Using mapping produces = "application/json; charset=utf-8" is highly recommended.
     *  In other case you will have bad Response with ISO character encoding.
     *  TODO: Add view by name for mapping '/view/name/{projectName}+' */
-    @RequestMapping(value = "/view/{projectId}", method = RequestMethod.GET,
+    @RequestMapping(value = "/view/{projectId}", method = RequestMethod.POST,
             produces = "application/json; charset=utf-8")
-    public String projectView(@PathVariable("projectId") String projectId,
-                              Model model) {
+    public String projectView(@PathVariable("projectId") String projectId) {
         try {
+            Message msg;
             if (!userSession.isLogged()) {
-                throw new NotAuthorizedException("Access denied. User not authorized.");
+                msg = new SimpleMessage(Message.CODE_NOT_LOGGED);
+            } else {
+                Project project;
+                List<Source> sources;
+                int id = Integer.parseInt(projectId);
+
+                project = projectService.getById(new Project(id));
+                if (project.getUser().getId() != userSession.getUser().getId()) {
+                    msg = new SimpleMessage(Message.CODE_NO_RIGHTS);
+                } else {
+                    sources = sourceService.getAll(new Source(new Project(id)));
+                    msg = new ProjectMessage(project, sources);
+                }
             }
 
-            Project project;
-            List<Source> sources;
-            int count;
-            int id = Integer.parseInt(projectId);
-
-            project = projectService.getById(new Project(id));
-            if (project.getUser().getId() != userSession.getUser().getId()) {
-                // TODO: Add model message here.
-                return "project-list";
-            }
-
-            sources = sourceService.getAll(new Source(new Project(id)));
-            count = sources.size();
-
-            model.addAttribute("project", project);
-            model.addAttribute("sources", sources);
-            model.addAttribute("count", count);
-
-            model.addAttribute("sessionUser", userSession.getUser().getName());
-            model.addAttribute("sessionProject", userSession.getProject().getName());
-
-            return "project-view";
-        } catch (NotAuthorizedException ex) {
-            LOGGER.warn(ex.getMessage());
-            return "not-authorized";
-        } catch (IndexOutOfBoundsException ex) {
-            return "no-index";
+            return msg.toString();
         } catch (Exception ex) {
             LOGGER.error("Server error.", ex);
-            return "server-error";
+            return "{\"code\":" + Message.CODE_SERVER_ERROR + "}";
         }
     }
 

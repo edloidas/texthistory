@@ -263,6 +263,19 @@ function Toolset() {
 var toolset = new Toolset();
 
 //------------------------------------------------------------------------
+// MESSAGES
+//------------------------------------------------------------------------
+function Message() {
+    this.CODE_SUCCESS        = 0;
+    this.CODE_NOT_LOGGED     = 1;
+    this.CODE_NO_PROJECT     = 2;
+    this.CODE_SERVER_ERROR   = 3;
+    this.CODE_UPDATED        = 4;
+    this.CODE_NO_RIGHTS      = 5;
+}
+var message = new Message();
+
+//------------------------------------------------------------------------
 // LOCAL STORAGE, SESSION AND GRAPHICS
 //------------------------------------------------------------------------
 function ThClient() {

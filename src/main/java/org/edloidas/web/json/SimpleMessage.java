@@ -8,12 +8,12 @@ public class SimpleMessage implements Message {
     /** Message code, as additional information. */
     private short code;
 
-    public SimpleMessage(short code) {
-        this.code = code;
-    }
-
     public SimpleMessage() {
         this.code = 0;
+    }
+
+    public SimpleMessage(short code) {
+        this.code = code;
     }
 
     public short getCode() {

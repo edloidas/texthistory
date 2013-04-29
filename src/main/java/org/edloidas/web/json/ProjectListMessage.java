@@ -51,7 +51,7 @@ public class ProjectListMessage implements Message {
     public String toString() {
         StringBuilder msg = new StringBuilder();
 
-        msg.append("{\"code\":").append(code).append(",\"projects\":[");
+        msg.append("{\"code\":").append(code).append(",\"project\":[");
         if (projects != null) {
             for (int i = 0; i < projects.size(); i++) {
                 if (i != 0) {
