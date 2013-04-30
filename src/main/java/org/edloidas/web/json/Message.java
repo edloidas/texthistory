@@ -12,6 +12,7 @@ public interface Message {
     public static final short CODE_SERVER_ERROR   = 3;
     public static final short CODE_UPDATED        = 4;
     public static final short CODE_NO_RIGHTS      = 5;
+    public static final short CODE_ALREADY_EXISTS = 6;
 
     @Override
     public abstract String toString();

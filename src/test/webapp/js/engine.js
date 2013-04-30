@@ -272,6 +272,7 @@ function Message() {
     this.CODE_SERVER_ERROR   = 3;
     this.CODE_UPDATED        = 4;
     this.CODE_NO_RIGHTS      = 5;
+    this.CODE_ALREADY_EXISTS = 6;
 }
 var message = new Message();
 

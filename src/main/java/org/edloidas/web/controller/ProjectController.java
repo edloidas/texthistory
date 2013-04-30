@@ -248,75 +248,27 @@ public class ProjectController {
                          @RequestParam(value = "name", required = true) String name,
                          @RequestParam(value = "desc", required = true) String desc) {
         try {
+            Message msg;
             if (!userSession.isLogged()) {
-                return "{\"code\":2,\"msg\":\"Access denied.\",\"data\":\"User has no rights to do this.\"}";
+                msg = new SimpleMessage(Message.CODE_NOT_LOGGED);
+            } else {
+                Project project = projectService.getById(new Project(Integer.parseInt(id)));
+                project.setName(name);
+                project.setDescription(desc);
+                project.update();
+                projectService.updateEntity(project);
+
+                if (userSession.getProject().getId() == Integer.parseInt(id)) {
+                    userSession.setProject(project);
+                }
+
+                msg = new SimpleMessage();
             }
 
-            JsonData json;
-            Project project = projectService.getById(new Project(Integer.parseInt(id)));
-            project.setName(name);
-            project.setDescription(desc);
-            project.update();
-            projectService.updateEntity(project);
-
-            if (userSession.getProject().getId() != Integer.parseInt(id)) {
-                json = new JsonData(0, "Project with name [" + project.getName() + "] updated.", project.getName());
-            } else { // Update if saved project is currently opened.
-                userSession.setProject(project);
-                json = new JsonData(3, "Project with name [" + project.getName() + "] updated.", project.getName());
-            }
-            return json.toString();
+            return msg.toString();
         } catch (Exception ex) {
-            LOGGER.info(ex.getMessage());
-            return "{\"code\":1,\"msg\":\"Server error.\",\"data\":\"See server log.\"}";
-        }
-    }
-
-    /**
-     * Handles and retrieves the AJAX request for file uploading.
-     *
-     * @return {@code String}, that represents text response of operation status.
-     */
-    /* Using mapping produces = "application/json; charset=utf-8" is highly recommended.
-    *  In other case you will have bad Response with ISO character encoding. */
-    @RequestMapping(value = "/{projectId}/upload", method = RequestMethod.POST,
-            produces = "application/json; charset=utf-8")
-    public
-    @ResponseBody
-    String projectFileUpload(@PathVariable("projectId") String id,
-                             @RequestParam(value = "file", required = true) CommonsMultipartFile file) {
-        try {
-            if (!userSession.isLogged()) {
-                return "{\"code\":2,\"msg\":\"Access denied.\",\"data\":\"User has no rights to do this.\"}";
-            }
-
-            BufferedReader in = new BufferedReader(new InputStreamReader(file.getInputStream()));
-            StringBuilder sb = new StringBuilder();
-            String text;
-
-            while ((text = in.readLine()) != null) {
-                sb.append(text).append("\n");
-            }
-            text = sb.toString();
-
-            // Get MD5
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            md5.update(text.getBytes(), 0, text.length());
-            BigInteger md5Number = new BigInteger(1, md5.digest());
-
-            List<Source> sources = sourceService.getAll(new Source(md5Number.toString(16)));
-            if (sources.size() != 0) {
-                return new JsonData(1, "File [" + file.getOriginalFilename() + "] not added. Reason: file with the same signature already exists.", "File with the same signature already exists.").toString();
-            }
-            Project project = projectService.getById(new Project(Integer.parseInt(id)));
-            Source src = new Source(file.getOriginalFilename(), text, md5Number.toString(16), project);
-            sourceService.addEntity(src);
-            userSession.setTextUpdated(false);
-
-            return new JsonData(3, "File [" + file.getOriginalFilename() + "] uploaded with total size of " + file.getSize() + " Bytes.", "Total size: " + file.getSize()).toString();
-        } catch (Exception ex) {
-            LOGGER.info(ex.getMessage());
-            return "{\"code\":1,\"msg\":\"Server error.\",\"data\":\"See server log.\"}";
+            LOGGER.error("Server error.", ex);
+            return "{\"code\":" + Message.CODE_SERVER_ERROR + "}";
         }
     }
 }
