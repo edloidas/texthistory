@@ -11,6 +11,7 @@ import org.edloidas.entity.dic.opencorpora.OpcorporaLemmeKey;
 import org.edloidas.entity.dic.opencorpora.OpcorporaLemmeWord;
 import org.edloidas.entity.dic.psycho.PsychoWord;
 import org.edloidas.entity.dic.stopwords.StopWord;
+import org.edloidas.text.SessionData;
 import org.edloidas.text.SymbolTextElement;
 import org.edloidas.text.TextElement;
 import org.edloidas.text.WordTextElement;
@@ -397,6 +398,10 @@ public class TextService {
     //------------------------------------------------------------------------
 
     // Fictitious methods ==============================
+    public SessionData getData() {
+        return new SessionData();
+    }
+
     public float getKeyPercentage() {
         float percentage = 0.0f;
         try {

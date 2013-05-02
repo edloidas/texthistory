@@ -132,6 +132,14 @@ public class SessionService {
      */
     public boolean setLogged(User auth, User db) {
         try {
+            /**
+             * Password comparison is UNSAFE and should be used in dev version only.
+             * 1. Move cypher generation to client side.
+             * 2. Store public key and encrypted password in database.
+             * 3. Store private and public keys on client side.
+             * 4. See http://kjur.github.io/jsrsasign/ for client implementation.
+             * TODO: Replace with safe password check version. (http://kjur.github.io/jsrsasign/)
+             */
             BigInteger pass1, pass2;
             MessageDigest pass1md = MessageDigest.getInstance("MD5");
             MessageDigest pass2md = MessageDigest.getInstance("MD5");

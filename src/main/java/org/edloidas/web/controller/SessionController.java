@@ -66,13 +66,54 @@ public class SessionController {
             produces = "application/json; charset=utf-8")
     public
     @ResponseBody
-    String content(Model model) {
+    String getHash(Model model) {
         try {
             Message msg;
             if (!userSession.isLogged()) {
                 msg = new SessionMessage(Message.CODE_NOT_LOGGED);
             } else { // empty hash is equals to "no project selected"
                 msg = new SessionMessage(Message.CODE_SUCCESS, userSession.getHash());
+            }
+            return msg.toString();
+        } catch (Exception ex) {
+            LOGGER.error("Server error.", ex);
+            return "{\"code\":" + Message.CODE_SERVER_ERROR + "}";
+        }
+    }
+
+    /**
+     * Handles access to result data.
+     *
+     * @return {@code String} of JSON data interpretation.
+     */
+    @RequestMapping(value = "/data", method = RequestMethod.POST,
+            produces = "application/json; charset=utf-8")
+    public
+    @ResponseBody
+    String getData(Model model) {
+        try {
+            Message msg;
+            if (!userSession.isLogged()) {
+                return (new SessionMessage(Message.CODE_NOT_LOGGED)).toString();
+            } else { // empty hash is equals to "no project selected"
+                if (userSession.getProject().getId() == -1) {
+                    msg = new SessionMessage(Message.CODE_NO_PROJECT);
+                } else {
+                    if (!userSession.isTextUpdated()) { // Text has been changed in project, but not yet updated.
+                        List<Source> sources = sourceService.getAll(new Source(userSession.getProject()));
+                        StringBuilder sb = new StringBuilder();
+
+                        for (Source src : sources) {
+                            if (src.getStatus())
+                                sb.append(src.getText()).append("\n");
+                        }
+
+                        textService.doUpdate(sb.toString());
+                        userSession.setTextUpdated(true); // Text is up to date.
+                    }
+
+                    msg = new SessionMessage(userSession.getHash(), textService.getData());
+                }
             }
             return msg.toString();
         } catch (Exception ex) {

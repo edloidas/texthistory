@@ -1,5 +1,7 @@
 package org.edloidas.web.json;
 
+import org.edloidas.text.SessionData;
+
 /**
  * Session message json response. Contains code, hash and sometimes data.
  */

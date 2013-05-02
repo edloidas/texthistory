@@ -23,6 +23,7 @@ import java.util.List;
  *
  * @author edloidas
  */
+@Deprecated
 @Controller
 @RequestMapping(value = "/content")
 @SessionAttributes({"userSession", "textService"})
