@@ -93,11 +93,43 @@ public class AbramovKeyDao implements CommonDao<AbramovKey> {
 
             hql_query.append("from ").append(AbramovKey.class.getName());
             if (o.getName() != null) {
-                //hql_query.append(" as a where a.name = \'").append(o.getName()).append("\'");
-                hql_query.append(" as a where a.name like \'").append(o.getName()).append("%\'");
+                hql_query.append(" as a where a.name = \'").append(o.getName()).append("\'");
+                //hql_query.append(" as a where a.name like \'").append(o.getName()).append("%\'");
             }
 
             return (List<AbramovKey>) sessionFactory.getCurrentSession().createQuery(hql_query.toString()).list();
+        } catch (Exception ex) {
+            LOGGER.info(ex.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Method return all AbramovKey from database, that match some value or expression.
+     * If {@code o} has other parameters, they are also will be included into select statement.
+     * Method uses 'word%' matcher to find record with name, if present.
+     * <b>Warning:</b> result is limited by some records. It should be used to improve query speed.
+     *
+     * @param o     is an {@code AbramovKey} generic type, that represents entity to be compared.
+     * @param limit value, that limits query records search.
+     *
+     * @return {@code List<AbramovKey>} of  generic type, that represents array of objects,
+     *         selected by some value.
+     */
+    @Override
+    public List<AbramovKey> getAll(AbramovKey o, int limit) {
+        StringBuilder hql_query;
+
+        try {
+            hql_query = new StringBuilder();
+
+            hql_query.append("from ").append(AbramovKey.class.getName());
+            if (o.getName() != null) {
+                hql_query.append(" as a where a.name like \'").append(o.getName()).append("%\'");
+            }
+
+            return (List<AbramovKey>) sessionFactory.getCurrentSession()
+                    .createQuery(hql_query.toString()).setMaxResults(limit).list();
         } catch (Exception ex) {
             LOGGER.info(ex.getMessage());
             return new ArrayList<>();

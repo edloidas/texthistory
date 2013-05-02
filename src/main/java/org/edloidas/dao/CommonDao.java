@@ -44,6 +44,19 @@ public interface CommonDao<T> {
     public List<T> getAll(T o);
 
     /**
+     * Method return all objects from database, that match some value or expression.
+     * If {@code o} has other parameters, they are also will be included into select statement.
+     * <b>Warning:</b> result is limited by some records. It should be used to improve query speed.
+     *
+     * @param o is an {@code T} generic type, that represents entity to be compared.
+     * @param limit value, that limits query records search.
+     *
+     * @return {@code List<T>} of  generic type, that represents array of objects,
+     *         selected by some value.
+     */
+    public List<T> getAll(T o, int limit);
+
+    /**
      * Method returns object with the same 'id'.
      * If {@code o} has other parameters, they are also will be included into select statement.
      *

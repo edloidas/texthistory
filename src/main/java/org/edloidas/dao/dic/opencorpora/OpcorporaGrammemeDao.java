@@ -136,6 +136,69 @@ public class OpcorporaGrammemeDao implements CommonDao<OpcorporaGrammeme> {
     }
 
     /**
+     * Method return all OpcorporaGrammeme from database, that match some value or expression.
+     * If {@code o} has other parameters, they are also will be included into select statement.
+     * Method uses 'word%' matcher to find record with name, if present.
+     * <b>Warning:</b> result is limited by some records. It should be used to improve query speed.
+     *
+     * @param o     is an {@code OpcorporaGrammeme} generic type, that represents entity to be compared.
+     * @param limit value, that limits query records search.
+     *
+     * @return {@code List<OpcorporaGrammeme>} of  generic type, that represents array of objects,
+     *         selected by some value.
+     */
+    @Override
+    public List<OpcorporaGrammeme> getAll(OpcorporaGrammeme o, int limit) {
+        StringBuilder hql_query;
+        boolean multiple;
+        try {
+            hql_query = new StringBuilder();
+            multiple = false;
+
+            hql_query.append("from ").append(OpcorporaGrammeme.class.getName());
+            if (o.getName() != null) {
+                hql_query.append(" as g where g.name like \'").append(o.getName()).append("%\'");
+                multiple = true;
+            }
+
+            if (o.getAlias() != null) {
+                if (!multiple) {
+                    hql_query.append(" as g where");
+                    multiple = true;
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" g.alias like \'").append(o.getAlias()).append("\'");
+            }
+
+            if (o.getDescription() != null) {
+                if (!multiple) {
+                    hql_query.append(" as g where");
+                    multiple = true;
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" g.description like \'").append(o.getDescription()).append("\'");
+            }
+
+            if (o.getParent() != null && o.getParent().getId() != 0) {
+                if (!multiple) {
+                    hql_query.append(" as g where");
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" g.opcorpora_grammeme.id = \'").append(o.getParent().getId()).append("\'");
+            }
+
+            return (List<OpcorporaGrammeme>) sessionFactory.getCurrentSession()
+                    .createQuery(hql_query.toString()).setMaxResults(limit).list();
+        } catch (Exception ex) {
+            LOGGER.info(ex.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Method returns OpcorporaGrammeme with the same 'id'.
      * If {@code o} has other parameters, they are also will be included into select statement.
      *

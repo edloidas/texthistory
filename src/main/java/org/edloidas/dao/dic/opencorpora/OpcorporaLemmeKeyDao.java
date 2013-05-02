@@ -95,7 +95,6 @@ public class OpcorporaLemmeKeyDao implements CommonDao<OpcorporaLemmeKey> {
             //hql_query.append("from ").append("opcorpora_lemme_key");
             hql_query.append("from ").append(OpcorporaLemmeKey.class.getName());
             if (o.getName() != null) {
-                //hql_query.append(" as a where a.name like \'").append(o.getName()).append("%\'");
                 hql_query.append(" as l where l.name like \'").append(o.getName()).append("%\'");
                 //hql_query.append(" as l where l.name like \'").append(o.getName()).append("\'");
                 multiple = true;
@@ -121,6 +120,60 @@ public class OpcorporaLemmeKeyDao implements CommonDao<OpcorporaLemmeKey> {
             }
 
             return (List<OpcorporaLemmeKey>) sessionFactory.getCurrentSession().createQuery(hql_query.toString()).list();
+        } catch (Exception ex) {
+            LOGGER.info(ex.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * Method return all OpcorporaLemmeKey from database, that match some value or expression.
+     * If {@code o} has other parameters, they are also will be included into select statement.
+     * Method uses 'word%' matcher to find record with name, if present.
+     * <b>Warning:</b> result is limited by some records. It should be used to improve query speed.
+     *
+     * @param o     is an {@code OpcorporaLemmeKey} generic type, that represents entity to be compared.
+     * @param limit value, that limits query records search.
+     *
+     * @return {@code List<OpcorporaLemmeKey>} of  generic type, that represents array of objects,
+     *         selected by some value.
+     */
+    @Override
+    public List<OpcorporaLemmeKey> getAll(OpcorporaLemmeKey o, int limit) {
+        StringBuilder hql_query;
+        boolean multiple;
+        try {
+            hql_query = new StringBuilder();
+            multiple = false;
+
+            //hql_query.append("from ").append("opcorpora_lemme_key");
+            hql_query.append("from ").append(OpcorporaLemmeKey.class.getName());
+            if (o.getName() != null) {
+                hql_query.append(" as l where l.name like \'").append(o.getName()).append("%\'");
+                multiple = true;
+            }
+
+            if (o.getGrammeme() != null && o.getGrammeme().getId() != 0) {
+                if (!multiple) {
+                    hql_query.append(" as l where");
+                    multiple = true;
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" l.opcorpora_grammeme.id = \'").append(o.getGrammeme().getId()).append("\'");
+            }
+
+            if (o.getLemme() != null && o.getLemme().getId() != 0) {
+                if (!multiple) {
+                    hql_query.append(" as l where");
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" l.opcorpora_lemme_key.id = \'").append(o.getLemme().getId()).append("\'");
+            }
+
+            return (List<OpcorporaLemmeKey>) sessionFactory.getCurrentSession()
+                    .createQuery(hql_query.toString()).setMaxResults(limit).list();
         } catch (Exception ex) {
             LOGGER.info(ex.getMessage());
             return new ArrayList<>();

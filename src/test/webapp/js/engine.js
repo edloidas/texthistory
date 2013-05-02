@@ -320,11 +320,6 @@ function ThClient() {
      * 2. Load data from storage, if necessary.
      * 3. Check state (project and session hash)
      * 4. Load data from server? if session hash have changed
-     *
-     * Possible states (return):
-     * 0 -- sync successfully.
-     * 1 -- hash not valid for server (no project selected)
-     * 2 -- communication error.
      */
     this.sync = function sync() {
         thclient.thmsg('Sync data. Please stand by.');
@@ -340,7 +335,7 @@ function ThClient() {
                 contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                 dataType: 'json'
             }).done(function (data) {
-                    if (data.code === 3) { // server error
+                    if (data.code === message.CODE_SERVER_ERROR) { // server error
                         throw 'Server error.';
                     }
                     code = data.code;
@@ -348,12 +343,12 @@ function ThClient() {
                 }).fail(function () {
                     throw 'Unable to sync data.';
                 });
-            if (code === 1) { // return to login page if not logged in
+            if (code === message.CODE_NOT_LOGGED) { // return to login page if not logged in
                 window.location = '/texthistory';
-                return 3;
+                return message.CODE_NOT_LOGGED;
             }
-            if (code === 2 || hash === '') { // no project selected
-                return 1;
+            if (code === message.CODE_NO_PROJECT || hash === '') { // no project selected
+                return message.CODE_NO_PROJECT;
             }
             if (localStorage['hash'] !== hash) {
                 $.ajax({
@@ -362,7 +357,7 @@ function ThClient() {
                     contentType: 'application/x-www-form-urlencoded; charset=UTF-8',
                     dataType: 'json'
                 }).done(function (data) {
-                        if (data.code == 3) { // server error
+                        if (data.code == message.CODE_SERVER_ERROR) { // server error
                             throw 'Server error.';
                         }
                         thclient.data = data.data;
@@ -376,12 +371,12 @@ function ThClient() {
         } catch (e) {
             thclient.notify('warning', e);
             console.warn(e);
-            return 2;
+            return message.CODE_SERVER_ERROR;
         }
         if (thclient.noty !== null) {
             thclient.noty.close();
         }
-        return 0;
+        return message.CODE_SUCCESS;
     };
 
     this.loadData = function loadData() {
@@ -930,7 +925,7 @@ function ThHandler() {
     /** Content analysis graphics */
     this.caGraphics = function caGraphics() {
         var status = thclient.sync();
-        if (status === 0) {
+        if (status === message.CODE_SUCCESS) {
             changePage('Графики',
                 [
                     {id: 'nav-ca-g-f', text: 'Частота'},
@@ -941,7 +936,7 @@ function ThHandler() {
                 ],
                 thclient.drawBarChart(thclient.data, 'content', 600));
         } else {
-            if (status === 1) {
+            if (status === message.CODE_NO_PROJECT) {
                 thclient.notify('warning', 'No project selected.');
             }
         }
@@ -949,7 +944,7 @@ function ThHandler() {
 
     this.caGraphicsCor = function caGraphicsCor() {
         var status = thclient.sync();
-        if (status === 0) {
+        if (status === message.CODE_SUCCESS) {
             changePage('Графики - Корреляция',
                 [
                     {id: 'nav-ca-g-f', text: 'Частота'},
@@ -960,7 +955,7 @@ function ThHandler() {
                 ],
                 'Not implemented.');
         } else {
-            if (status === 1) {
+            if (status === message.CODE_NO_PROJECT) {
                 thclient.notify('warning', 'No project selected.');
             }
         }
@@ -968,7 +963,7 @@ function ThHandler() {
 
     this.caGraphicsTag = function caGraphicsTag() {
         var status = thclient.sync();
-        if (status === 0) {
+        if (status === message.CODE_SUCCESS) {
             changePage('Графики - Облако тегов',
                 [
                     {id: 'nav-ca-g-f', text: 'Частота'},
@@ -979,7 +974,7 @@ function ThHandler() {
                 ],
                 thclient.drawCloudChart(thclient.data, 'data', 600));
         } else {
-            if (status === 1) {
+            if (status === message.CODE_NO_PROJECT) {
                 thclient.notify('warning', 'No project selected.');
             }
         }
@@ -987,7 +982,7 @@ function ThHandler() {
 
     this.caGraphicsCat = function caGraphicsCat() {
         var status = thclient.sync();
-        if (status === 0) {
+        if (status === message.CODE_SUCCESS) {
             changePage('Графики - Круг тегов',
                 [
                     {id: 'nav-ca-g-f', text: 'Частота'},
@@ -998,7 +993,7 @@ function ThHandler() {
                 ],
                 thclient.drawCircleChart(thclient.data, 'data', 600));
         } else {
-            if (status === 1) {
+            if (status === message.CODE_NO_PROJECT) {
                 thclient.notify('warning', 'No project selected.');
             }
         }
@@ -1008,7 +1003,7 @@ function ThHandler() {
     /** Content analysis key words list */
     this.caKeyList = function caKeyList() {
         var status = thclient.sync();
-        if (status === 0) {
+        if (status === message.CODE_SUCCESS) {
             changePage('Ключевые слова/категории',
                 [
                     {id: 'do-cont-key-list-view', text: 'Просмотреть'},
@@ -1016,7 +1011,7 @@ function ThHandler() {
                 ],
                 thclient.createTable(thclient.data, 'data'));
         } else {
-            if (status === 1) {
+            if (status === message.CODE_NO_PROJECT) {
                 thclient.notify('warning', 'No project selected.');
             }
         }

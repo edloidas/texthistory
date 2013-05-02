@@ -98,7 +98,7 @@ public class ProjectController {
      *
      * @return {@code String}, that represents text response of operation status.
      */
-    @RequestMapping(value = "/new", method = RequestMethod.POST,
+    @RequestMapping(value = "/add", method = RequestMethod.POST,
             produces = "application/json; charset=utf-8")
     public
     @ResponseBody

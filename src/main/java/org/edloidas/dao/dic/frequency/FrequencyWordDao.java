@@ -116,6 +116,49 @@ public class FrequencyWordDao implements CommonDao<FrequencyWord> {
     }
 
     /**
+     * Method return all FrequencyWord from database, that match some value or expression.
+     * If {@code o} has other parameters, they are also will be included into select statement.
+     * Method uses 'word%' matcher to find record with name, if present.
+     * <b>Warning:</b> result is limited by some records. It should be used to improve query speed.
+     *
+     * @param o     is an {@code FrequencyWord} generic type, that represents entity to be compared.
+     * @param limit value, that limits query records search.
+     *
+     * @return {@code List<FrequencyWord>} of  generic type, that represents array of objects,
+     *         selected by some value.
+     */
+    @Override
+    public List<FrequencyWord> getAll(FrequencyWord o, int limit) {
+        StringBuilder hql_query;
+        boolean multiple;
+        try {
+            hql_query = new StringBuilder();
+            multiple = false;
+
+            hql_query.append("from ").append(FrequencyWord.class.getName());
+            if (o.getName() != null) {
+                hql_query.append(" as f where f.name like \'").append(o.getName()).append("%\'");
+                multiple = true;
+            }
+
+            if (o.getFreq() != 0.0d) {
+                if (!multiple) {
+                    hql_query.append(" as f where");
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" f.freq = \'").append(o.getFreq()).append("\'");
+            }
+
+            return (List<FrequencyWord>) sessionFactory.getCurrentSession()
+                    .createQuery(hql_query.toString()).setMaxResults(limit).list();
+        } catch (Exception ex) {
+            LOGGER.info(ex.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Method returns FrequencyWord with the same 'id'.
      * If {@code o} has other parameters, they are also will be included into select statement.
      *

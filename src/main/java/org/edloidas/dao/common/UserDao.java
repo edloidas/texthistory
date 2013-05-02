@@ -126,6 +126,59 @@ public class UserDao implements CommonDao<User> {
     }
 
     /**
+     * Method return all User from database, that match some value or expression.
+     * If {@code o} has other parameters, they are also will be included into select statement.
+     * <b>Warning:</b> result is limited by some records. It should be used to improve query speed.
+     *
+     * @param o     is an {@code User} generic type, that represents entity to be compared.
+     * @param limit value, that limits query records search.
+     *
+     * @return {@code List<User>} of  generic type, that represents array of objects,
+     *         selected by some value.
+     */
+    @Override
+    public List<User> getAll(User o, int limit) {
+        StringBuilder hql_query;
+        boolean multiple; // determines if there is already 'where'
+
+        try {
+            hql_query = new StringBuilder();
+            multiple = false;
+
+            hql_query.append("from ").append(User.class.getName());
+            if (o.getLogin() != null) {
+                hql_query.append(" as u where u.login = \'").append(o.getLogin()).append("\'");
+                multiple = true;
+            }
+
+            if (o.getPassword() != null) {
+                if (!multiple) {
+                    hql_query.append(" as u where");
+                    multiple = true;
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" u.password = \'").append(o.getPassword()).append("\'");
+            }
+
+            if (o.getName() != null) {
+                if (!multiple) {
+                    hql_query.append(" as u where");
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" u.name = \'").append(o.getName()).append("\'");
+            }
+
+            return (List<User>) sessionFactory.getCurrentSession()
+                    .createQuery(hql_query.toString()).setMaxResults(limit).list();
+        } catch (Exception ex) {
+            LOGGER.info(ex.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Method returns User with the same 'id'.
      * If {@code o} has other parameters, they are also will be included into select statement.
      *

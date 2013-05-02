@@ -136,6 +136,69 @@ public class SourceDao implements CommonDao<Source> {
     }
 
     /**
+     * Method return all Source from database, that match some value or expression.
+     * If {@code o} has other parameters, they are also will be included into select statement.
+     * <b>Warning:</b> result is limited by some records. It should be used to improve query speed.
+     *
+     * @param o     is an {@code Source} generic type, that represents entity to be compared.
+     * @param limit value, that limits query records search.
+     *
+     * @return {@code List<Source>} of  generic type, that represents array of objects,
+     *         selected by some value.
+     */
+    @Override
+    public List<Source> getAll(Source o, int limit) {
+        StringBuilder hql_query;
+        boolean multiple; // determines if there is already 'where'
+
+        try {
+            hql_query = new StringBuilder();
+            multiple = false;
+
+            hql_query.append("from ").append(Source.class.getName());
+            if (o.getName() != null) {
+                hql_query.append(" as s where s.name = \'").append(o.getName()).append("\'");
+                multiple = true;
+            }
+
+            if (o.getUploaded() != null) {
+                if (!multiple) {
+                    hql_query.append(" as s where");
+                    multiple = true;
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" s.uploaded = \'").append(o.getUploaded()).append("\'");
+            }
+
+            if (o.getMd5() != null) {
+                if (!multiple) {
+                    hql_query.append(" as s where");
+                    multiple = true;
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" s.md5 = \'").append(o.getMd5()).append("\'");
+            }
+
+            if (o.getProject() != null && o.getProject().getId() != 0) {
+                if (!multiple) {
+                    hql_query.append(" as s where");
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" s.project.id = \'").append(o.getProject().getId()).append("\'");
+            }
+
+            return (List<Source>) sessionFactory.getCurrentSession()
+                    .createQuery(hql_query.toString()).setMaxResults(limit).list();
+        } catch (Exception ex) {
+            LOGGER.info(ex.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Method returns Source with the same 'id'.
      * If {@code o} has other parameters, they are also will be included into select statement.
      *

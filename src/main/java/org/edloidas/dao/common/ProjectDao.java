@@ -136,6 +136,69 @@ public class ProjectDao implements CommonDao<Project> {
     }
 
     /**
+     * Method return all Project from database, that match some value or expression.
+     * If {@code o} has other parameters, they are also will be included into select statement.
+     * <b>Warning:</b> result is limited by some records. It should be used to improve query speed.
+     *
+     * @param o     is an {@code Project} generic type, that represents entity to be compared.
+     * @param limit value, that limits query records search.
+     *
+     * @return {@code List<Project>} of  generic type, that represents array of objects,
+     *         selected by some value.
+     */
+    @Override
+    public List<Project> getAll(Project o, int limit) {
+        StringBuilder hql_query;
+        boolean multiple; // determines if there is already 'where'
+
+        try {
+            hql_query = new StringBuilder();
+            multiple = false;
+
+            hql_query.append("from ").append(Project.class.getName());
+            if (o.getName() != null) {
+                hql_query.append(" as p where p.name = \'").append(o.getName()).append("\'");
+                multiple = true;
+            }
+
+            if (o.getCreated() != null) {
+                if (!multiple) {
+                    hql_query.append(" as p where");
+                    multiple = true;
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" p.created = \'").append(o.getCreated()).append("\'");
+            }
+
+            if (o.getUpdated() != null) {
+                if (!multiple) {
+                    hql_query.append(" as p where");
+                    multiple = true;
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" p.updated = \'").append(o.getUpdated()).append("\'");
+            }
+
+            if (o.getUser() != null && o.getUser().getId() != 0) {
+                if (!multiple) {
+                    hql_query.append(" as p where");
+                } else {
+                    hql_query.append(" and");
+                }
+                hql_query.append(" p.user.id = \'").append(o.getUser().getId()).append("\'");
+            }
+
+            return (List<Project>) sessionFactory.getCurrentSession()
+                    .createQuery(hql_query.toString()).setMaxResults(limit).list();
+        } catch (Exception ex) {
+            LOGGER.info(ex.getMessage());
+            return new ArrayList<>();
+        }
+    }
+
+    /**
      * Method returns Project with the same 'id'.
      * If {@code o} has other parameters, they are also will be included into select statement.
      *
